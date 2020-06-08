@@ -1,0 +1,8 @@
+[template]
+src = "nameserver.sh.tmpl"
+dest = "/opt/app/bin/tmpl/nameserver.sh"
+mode = "0700"
+keys = [
+  "/",
+]
+reload_cmd = "/opt/app/bin/tmpl/nameserver.sh; appctl reload nameserver"

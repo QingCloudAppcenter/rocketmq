@@ -1,0 +1,68 @@
+---
+- name: Create local cache Directories
+  file:
+    path: "{{ local_cache_path }}/rocketmq"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+    recurse: yes
+  run_once: True
+  delegate_to: localhost
+
+- name: copy jar to local_cache_path
+  copy:
+    src: "../deps/scripts/rocketmq-console-{{ console_version }}.jar"
+    dest: "{{ local_cache_path }}/rocketmq/rocketmq-console-{{ console_version }}.jar"
+    owner: root
+    group: root
+    mode: preserve
+    directory_mode: u=rwx,g=rx,o=
+  delegate_to: localhost
+
+- name: prepare service directories
+  file:
+    path: "/opt/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    state: directory
+  with_items:
+    - "rocketmq-console/{{ console_version }}"
+
+- name: create symbolic links
+  file:
+    src: "/opt/{{ item.name }}/{{ item.version }}"
+    dest: /opt/{{ item.name }}/current
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    state: link
+  with_items:
+    - name: rocketmq-console
+      version: "{{ console_version }}"
+
+- name: install console jar
+  copy:
+    src: "{{ local_cache_path }}/rocketmq/rocketmq-console-{{ console_version }}.jar"
+    dest: "/opt/rocketmq-console/{{ console_version }}/rocketmq-console.jar"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: preserve
+    directory_mode: u=rwx,g=rwx,o=
+
+- name: copy systemd files
+  copy: #拷贝service文件
+    src: files/{{ item }}
+    dest: /{{ item }}
+    directory_mode: yes
+  with_items:
+    - lib/systemd/system/
+
+- name: disable auto start
+  systemd:
+    name: "{{ svc_name }}"
+    state: stopped
+    masked: yes
+  loop:
+  - rocketmq-console
+  loop_control:
+    loop_var: svc_name

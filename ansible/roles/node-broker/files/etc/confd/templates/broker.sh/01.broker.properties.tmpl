@@ -1,0 +1,40 @@
+
+
+{{ $groupId := getv "/host/gid" -}}
+{{ $nodeRole := getv "/host/role" }}
+{{ $brokerPort := getv "/cluster/endpoints/broker/port" "10911" }}
+{{ $namesvrPort := getv "/cluster/endpoints/nameserver/port" "9876" }}
+namesvrList="{{- range $i, $ip := getvs "/hosts/nameserver/*/ip" }}{{ if $i }};{{ end }}{{ $ip }}:{{ $namesvrPort }}{{- end }}"
+{{ range getvs "/host/role" | filter "broker*" -}}
+{{ $isMaster := eq . "broker" -}}
+brokerId=0
+{{- if not $isMaster }}
+  {{- $nodeSid := getv "/host/sid" }}
+  {{- range $nodeId := lsdir "/hosts/broker-replica" }}
+
+    {{- if eq (getv (printf "/hosts/broker-replica/%s/gid" $nodeId)) $groupId }}
+      {{- if le (getv (printf "/hosts/broker-replica/%s/sid" $nodeId)) $nodeSid }}
+brokerId=$(( brokerId + 1 ))
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+
+flush /opt/app/conf/broker/broker.properties << BROKER_CONF_EOF
+brokerClusterName = {{ getv "/env/cluster_name" "DefaultCluster" }}
+namesrvAddr = $namesvrList
+brokerIP1 = {{ getv "/host/ip" }}
+listenPort = {{ $brokerPort }}
+brokerName = broker-{{ $groupId }}
+brokerId = ${brokerId}
+storePathCommitLog = /data/broker/commitlog/
+storePathConsumerQueue = /data/broker/consumequeue/
+deleteWhen = {{ getv "/env/delete_when" "4" }}
+fileReservedTime = {{ getv "/env/file_reserved_time" "72" }}
+brokerRole = {{ if $isMaster }}{{ getv "/env/replica_mode" "SYNC" }}_MASTER{{ else }}SLAVE{{ end }}
+flushDiskType = {{ getv "/env/flush_disk_type" "ASYNC_FLUSH" }}
+
+BROKER_CONF_EOF
+
+{{- end }}

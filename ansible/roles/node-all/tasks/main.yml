@@ -1,0 +1,16 @@
+---
+- name: prepare service directories
+  file:
+    path: "{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    state: directory
+  with_items:
+    - "/data/broker"
+    - "/data/console"
+    - "/data/nameserver"
+    - "/opt/app"
+
+- name: install confd files
+  include_role:
+    name: confd-files-1.0.2

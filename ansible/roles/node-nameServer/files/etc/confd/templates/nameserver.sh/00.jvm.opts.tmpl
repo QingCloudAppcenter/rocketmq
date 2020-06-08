@@ -1,0 +1,18 @@
+
+{{- $halfMemory := div (getv "/host/memory") 2 }}
+
+flush /opt/app/conf/nameserver/nameserver.env << NAMESERVER_JVM_ENV
+
+ROCKETMQ_HOME="/opt/rocketmq/current"
+JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+JAVA_OPT="-server \
+-XX:-UseBiasedLocking \
+-Duser.home=/data/nameserver \
+-Xms{{ $halfMemory }}m \
+-Xmx{{ $halfMemory }}m \
+-XX:+ExitOnOutOfMemoryError \
+-XX:ErrorFile=/data/nameserver/logs/hs_err.log \
+-XX:+PrintClassHistogram \
+-XX:+PrintTenuringDistribution "
+
+NAMESERVER_JVM_ENV
