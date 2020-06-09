@@ -1,8 +1,3 @@
-#!/usr/bin/env bash
-
-set -e
-
-
 ##############
 ##  Broker  ##
 ##############
@@ -10,6 +5,8 @@ set -e
 brokerDataDir="/data/broker"
 
 initNode() {
+  export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64";
+  export PATH="$JAVA_HOME/bin:$PATH";
   usermod -d /data/broker -u $(id -u rocketmq) rocketmq
   # Fix permissions for attached volume.
   chown -R rocketmq.rocketmq ${brokerDataDir}
