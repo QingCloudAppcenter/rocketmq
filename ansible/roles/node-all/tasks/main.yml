@@ -11,6 +11,12 @@
     - "/data/nameserver"
     - "/opt/app"
 
+- name: Replace caddy service
+  replace:
+    path: "/lib/systemd/system/caddy.service"
+    regexp: '=caddy'
+    replace: '={{ user }}'
+
 - name: install confd files
   include_role:
     name: confd-files-1.0.2

@@ -14,12 +14,12 @@
     - app-agent-1.0.1
     - appctl-1.0.9
     - arping-1.0.0
+    - caddy-1.0.6
     - rocketmq
     - node-all
     - rocketmq-console
     - node-console
     - node-broker
     - node-nameServer
-#     - caddy-1.0.6
     loop_control:
       loop_var: service_name

@@ -9,7 +9,7 @@
     "container": {
       "type": "lxc",
       "zone": "pek3a",
-      "image": "img-d7lorouq"
+      "image": "img-yjlute87"
     },
     "role": "nameserver",
     "count": {{cluster.nameserver.count}},
@@ -44,7 +44,7 @@
     "container": {
       "type": "lxc",
       "zone": "pek3a",
-      "image": "img-d7lorouq"
+      "image": "img-yjlute87"
     },
     "role": "broker",
     "count": {{cluster.broker.count}},
@@ -151,7 +151,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3a",
-      "image": "img-d7lorouq"
+      "image": "img-yjlute87"
     },
     "role": "console",
     "count": {{cluster.console.count}},
@@ -190,7 +190,7 @@
     "container": {
       "type": "kvm",
       "zone": "pek3a",
-      "image": "img-d7lorouq"
+      "image": "img-yjlute87"
     },
     "role": "client",
     "count": {{cluster.client.count}},
@@ -204,7 +204,6 @@
       }
     }
   }],
-
   "display_tabs": {
     "brokerList": {
       "cmd": "appctl readClusterListFromNameserver",
@@ -212,7 +211,11 @@
       "description": "Cluster information - broker names, broker IDs and broker addresses"
     }
   },
-
+  "env": {
+    "web_console_enabled": {{env.web_console_enabled}},
+    "web_console_username": {{env.web_console_username}},
+    "web_console_password": {{env.web_console_password}}
+  },
   "endpoints": {
     "nameserver": {
       "port": 9876,
