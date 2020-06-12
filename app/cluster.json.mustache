@@ -39,6 +39,11 @@
       "check_cmd": "appctl check",
       "action_cmd": "appctl restart"
     },
+    "env": {
+      "web_console_enabled": {{env.web_console_enabled}},
+      "web_console_username": {{env.web_console_username}},
+      "web_console_password": {{env.web_console_password}}
+    },
     "vertical_scaling_policy": "sequential"
   }, {
     "container": {
@@ -144,7 +149,10 @@
       "delete_when": {{env.broker.delete_when}},
       "file_reserved_time": {{env.broker.file_reserved_time}},
       "replica_mode": {{env.broker.replica_mode}},
-      "flush_disk_type": {{env.broker.flush_disk_type}}
+      "flush_disk_type": {{env.broker.flush_disk_type}},
+      "web_console_enabled": {{env.web_console_enabled}},
+      "web_console_username": {{env.web_console_username}},
+      "web_console_password": {{env.web_console_password}}
     },
     "vertical_scaling_policy": "sequential"
   }, {
@@ -183,7 +191,10 @@
     },
     "env": {
       "user_name": {{env.console.user_name}},
-      "user_pwd": {{env.console.user_pwd}}
+      "user_pwd": {{env.console.user_pwd}},
+      "web_console_enabled": {{env.web_console_enabled}},
+      "web_console_username": {{env.web_console_username}},
+      "web_console_password": {{env.web_console_password}}
     },
     "vertical_scaling_policy": "sequential"
   }, {
@@ -210,11 +221,6 @@
       "roles_to_execute_on": ["nameserver"],
       "description": "Cluster information - broker names, broker IDs and broker addresses"
     }
-  },
-  "env": {
-    "web_console_enabled": {{env.web_console_enabled}},
-    "web_console_username": {{env.web_console_username}},
-    "web_console_password": {{env.web_console_password}}
   },
   "endpoints": {
     "nameserver": {
