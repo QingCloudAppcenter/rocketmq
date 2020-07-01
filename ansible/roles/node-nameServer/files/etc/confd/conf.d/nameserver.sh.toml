@@ -5,4 +5,4 @@ mode = "0700"
 keys = [
   "/",
 ]
-reload_cmd = "/opt/app/bin/tmpl/nameserver.sh; appctl reload nameserver"
+reload_cmd = "/opt/app/bin/tmpl/nameserver.sh; appctl reload rocketmq-nameserver"

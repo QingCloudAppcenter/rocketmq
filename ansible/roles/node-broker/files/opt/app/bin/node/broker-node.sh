@@ -1,17 +1,15 @@
-#!/usr/bin/env bash
-
-set -e
-
-
 ##############
 ##  Broker  ##
 ##############
 
-brokerDataDir="/data/broker"
-
-initNode() {
+setEnvVar() {
   export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64";
   export PATH="$JAVA_HOME/bin:$PATH";
+}
+
+brokerDataDir="/data/broker"
+initNode() {
+  setEnvVar
   usermod -d /data/broker -u $(id -u rocketmq) rocketmq
   # Fix permissions for attached volume.
   chown -R rocketmq.rocketmq ${brokerDataDir}
@@ -19,11 +17,19 @@ initNode() {
   _initNode
 }
 
+metricsFile="/data/broker/rocketmq-metrics.json"
 measure() {
+  [[ -f "${metricsFile}" ]] && cat ${metricsFile} || echo '{}'
+
+  [[ ( ! -f ${metricsFile} ) || ( `stat --format %Y ${metricsFile}` -lt $((`date +%s`  - 19)) ) ]] && generateBrokerMetrics &
+}
+
+generateBrokerMetrics() {
+  setEnvVar
   local filter metrics putTps getFoundTps getMissTps getTotalTps;
   local getTransferedTps getCountToday putCountToday msgAvgSize;
   filter="stub|putTps|getFoundTps|getMissTps|getTotalTps|getTransferedTps|msgGetTotalTodayNow|msgPutTotalTodayNow|msgGetTotalTodayMorning|msgPutTotalTodayMorning|putMessageAverageSize" ;
-  metrics=$(timeout -s SIGKILL 6s /opt/rocketmq/current/bin/mqadmin brokerStatus -b "localhost:${BROKER_PORT:-10911}" |& grep -E "^($filter)" | awk '{print $1, $3}')
+  metrics=$(timeout -s SIGKILL 30s /opt/rocketmq/current/bin/mqadmin brokerStatus -b "localhost:${BROKER_PORT:-10911}" |& grep -E "^($filter)" | awk '{print $1, $3}')
   putTps=$(echo "$metrics" | awk '$1=="putTps" {printf("%d", $2*1000)}')
   getFoundTps=$(echo "$metrics" | awk '$1=="getFoundTps" {printf("%d", $2*1000)}')
   getMissTps=$(echo "$metrics" | awk '$1=="getMissTps" {printf("%d", $2*1000)}')
@@ -33,7 +39,7 @@ measure() {
   putCountToday=$(echo "$metrics" | awk '/msgPutTotalTodayNow/ {LATTER=$2} /msgPutTotalTodayMorning/ {FORMER=$2} END {printf("%d", LATTER - FORMER)}')
   msgAvgSize=$(echo "$metrics" | awk '$1=="putMessageAverageSize" {printf("%d", $2/8*100)}')
 
-  cat << METRICS_FILE
+  cat > ${metricsFile}  << METRICS_FILE
 {
   "putTps": ${putTps:-0},
   "getFoundTps": ${getFoundTps:-0},

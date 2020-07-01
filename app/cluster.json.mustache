@@ -4,12 +4,15 @@
   "vxnet": {{cluster.vxnet}},
   "multi_zone_policy": "round_robin",
   "advanced_actions": ["change_vxnet", "scale_horizontal"],
-
+  "upgrade_policy": [
+    "appv-md9fjdpf"
+  ],
+  "upgrading_policy": "parallel",
   "nodes": [{
     "container": {
       "type": "lxc",
-      "zone": "pek3a",
-      "image": "img-yjlute87"
+      "zone": "sh1a",
+      "image": "img-i11kmm1f"
     },
     "role": "nameserver",
     "count": {{cluster.nameserver.count}},
@@ -18,7 +21,7 @@
     "instance_class": {{cluster.nameserver.instance_class}},
     "services": {
       "start": {
-      "order": 1,
+        "order": 1,
         "cmd": "appctl start"
       },
       "stop": {
@@ -48,8 +51,8 @@
   }, {
     "container": {
       "type": "lxc",
-      "zone": "pek3a",
-      "image": "img-yjlute87"
+      "zone": "sh1a",
+      "image": "img-i11kmm1f"
     },
     "role": "broker",
     "count": {{cluster.broker.count}},
@@ -158,8 +161,8 @@
   }, {
     "container": {
       "type": "kvm",
-      "zone": "pek3a",
-      "image": "img-yjlute87"
+      "zone": "sh1a",
+      "image": "img-i11kmm1f"
     },
     "role": "console",
     "count": {{cluster.console.count}},
@@ -200,8 +203,8 @@
   }, {
     "container": {
       "type": "kvm",
-      "zone": "pek3a",
-      "image": "img-yjlute87"
+      "zone": "sh1a",
+      "image": "img-i11kmm1f"
     },
     "role": "client",
     "count": {{cluster.client.count}},

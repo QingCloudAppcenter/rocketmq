@@ -1,6 +1,6 @@
+{{- if getvs "/host/role" | filter "(broker|broker-replica)" }}
 
 {{- $halfMemory := div (getv "/host/memory") 2 }}
-
 flush /opt/app/conf/broker/broker.env << BROKER_JVM_ENV
 
 ROCKETMQ_HOME="/opt/rocketmq/current"

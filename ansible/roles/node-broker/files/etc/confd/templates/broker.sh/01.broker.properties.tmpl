@@ -1,5 +1,3 @@
-
-
 {{ $groupId := getv "/host/gid" -}}
 {{ $nodeRole := getv "/host/role" }}
 {{ $brokerPort := getv "/cluster/endpoints/broker/port" "10911" }}
@@ -20,7 +18,6 @@ brokerId=$(( brokerId + 1 ))
   {{- end }}
 {{- end }}
 
-
 flush /opt/app/conf/broker/broker.properties << BROKER_CONF_EOF
 brokerClusterName = {{ getv "/env/cluster_name" "DefaultCluster" }}
 namesrvAddr = $namesvrList
@@ -36,5 +33,5 @@ brokerRole = {{ if $isMaster }}{{ getv "/env/replica_mode" "SYNC" }}_MASTER{{ el
 flushDiskType = {{ getv "/env/flush_disk_type" "ASYNC_FLUSH" }}
 
 BROKER_CONF_EOF
-
+{{- end }}
 {{- end }}

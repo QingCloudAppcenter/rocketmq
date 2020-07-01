@@ -5,4 +5,4 @@ mode = "0700"
 keys = [
   "/",
 ]
-reload_cmd = "/opt/app/bin/tmpl/broker.sh; appctl reload broker"
+reload_cmd = "/opt/app/bin/tmpl/broker.sh; appctl reload rocketmq-broker"

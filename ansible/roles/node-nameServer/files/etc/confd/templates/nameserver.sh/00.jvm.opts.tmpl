@@ -1,4 +1,4 @@
-
+{{- if getvs "/host/role" | filter "nameserver" }}
 {{- $halfMemory := div (getv "/host/memory") 2 }}
 
 flush /opt/app/conf/nameserver/nameserver.env << NAMESERVER_JVM_ENV
@@ -16,3 +16,4 @@ JAVA_OPT="-server \
 -XX:+PrintTenuringDistribution "
 
 NAMESERVER_JVM_ENV
+{{- end }}

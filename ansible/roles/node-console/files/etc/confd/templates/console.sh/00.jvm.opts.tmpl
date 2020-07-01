@@ -1,4 +1,4 @@
-
+{{- if getvs "/host/role" | filter "console" }}
 {{- $halfMemory := div (getv "/host/memory") 2 }}
 {{- $namesvrPort := getv "/cluster/endpoints/nameserver/port" "9876" }}
 

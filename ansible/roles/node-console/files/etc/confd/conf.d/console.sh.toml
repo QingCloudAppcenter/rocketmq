@@ -5,4 +5,4 @@ mode = "0700"
 keys = [
   "/",
 ]
-reload_cmd = "/opt/app/bin/tmpl/console.sh; appctl reload console"
+reload_cmd = "/opt/app/bin/tmpl/console.sh; appctl reload rocketmq-console"
