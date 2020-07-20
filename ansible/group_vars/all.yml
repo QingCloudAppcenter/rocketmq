@@ -1,4 +1,4 @@
-mq_version: 4.7.0
+mq_version: 4.7.1
 user: rocketmq
 console_version: 1.0.1
 local_cache_path: "~/.ansible/cache"

@@ -7,7 +7,7 @@ Type=simple
 User=rocketmq
 Group=rocketmq
 EnvironmentFile=/opt/app/conf/console/console.env
-ExecStart=/bin/bash -c 'java $JAVA_OPT -jar /opt/rocketmq-console/current/rocketmq-console.jar --rocketmq.config.dataPath="/opt/app/conf/console" "${ENABLE_LOGIN_PWD}" "${NAME_SERVER_LIST}"'
+ExecStart=/bin/bash -c 'java $JAVA_OPT -jar /opt/apache-rocketmq-console/current/lib/app.jar'
 KillMode=process
 Restart=always
 

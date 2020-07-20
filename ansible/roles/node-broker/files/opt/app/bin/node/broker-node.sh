@@ -1,19 +1,21 @@
 ##############
 ##  Broker  ##
 ##############
+# Error codes
+EC_INSUFFICIENT_VOLUME=230
+EC_UNHEALTHY=240
 
 setEnvVar() {
   export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64";
   export PATH="$JAVA_HOME/bin:$PATH";
 }
 
-brokerDataDir="/data/broker"
 initNode() {
   setEnvVar
-  usermod -d /data/broker -u $(id -u rocketmq) rocketmq
+  usermod -d ${DATA_MOUNTS} -u $(id -u rocketmq) rocketmq
   # Fix permissions for attached volume.
-  chown -R rocketmq.rocketmq ${brokerDataDir}
-  chmod -R u=rwx,g=rx,o= ${brokerDataDir}
+  chown -R rocketmq.rocketmq ${DATA_MOUNTS}
+  chmod -R u=rwx,g=rx,o= ${DATA_MOUNTS}
   _initNode
 }
 
@@ -51,4 +53,20 @@ generateBrokerMetrics() {
   "msgAvgSize": ${msgAvgSize:-0}
 }
 METRICS_FILE
+}
+
+checkVolume() {
+  local hostVolumeUsed
+  hostVolumeUsed="$(df -h ${DATA_MOUNTS} | awk 'NR == 2 {print $5}')"; #" * <= 80%"
+  [[ "${hostVolumeUsed%%%}" -lt "80" ]] || return ${EC_INSUFFICIENT_VOLUME}
+}
+
+revive() {
+  local ret; ret="$(appctl check)";
+  [[ ${ret} -ge 230 && ${ret} -lt 240 ]] && log "WARN: appctl check return EC${ret}" || _revive
+}
+
+check() {
+  checkVolume;
+  _check
 }

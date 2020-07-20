@@ -4,15 +4,12 @@
   "vxnet": {{cluster.vxnet}},
   "multi_zone_policy": "round_robin",
   "advanced_actions": ["change_vxnet", "scale_horizontal"],
-  "upgrade_policy": [
-    "appv-md9fjdpf"
-  ],
-  "upgrading_policy": "parallel",
+
   "nodes": [{
     "container": {
       "type": "lxc",
-      "zone": "sh1a",
-      "image": "img-86ly6xwt"
+      "zone": "pek3a",
+      "image": "img-tkf29bfm"
     },
     "role": "nameserver",
     "count": {{cluster.nameserver.count}},
@@ -21,15 +18,13 @@
     "instance_class": {{cluster.nameserver.instance_class}},
     "services": {
       "start": {
-        "order": 1,
-        "cmd": "appctl start"
+        "cmd": "/opt/app/bin/ctl.sh restart nameserver"
       },
       "stop": {
-        "order": 3,
-        "cmd": "appctl stop"
+        "cmd": "/opt/app/bin/ctl.sh stop nameserver"
       },
       "restart": {
-        "cmd": "appctl restart"
+        "cmd": "/opt/app/bin/ctl.sh restart nameserver"
       }
     },
     "health_check": {
@@ -39,20 +34,15 @@
       "action_timeout_sec": 30,
       "healthy_threshold": 2,
       "unhealthy_threshold": 2,
-      "check_cmd": "appctl check",
-      "action_cmd": "appctl restart"
-    },
-    "env": {
-      "web_console_enabled": {{env.web_console_enabled}},
-      "web_console_username": {{env.web_console_username}},
-      "web_console_password": {{env.web_console_password}}
+      "check_cmd": "/opt/app/bin/ctl.sh check nameserver",
+      "action_cmd": "/opt/app/bin/ctl.sh restart nameserver"
     },
     "vertical_scaling_policy": "sequential"
   }, {
     "container": {
       "type": "lxc",
-      "zone": "sh1a",
-      "image": "img-86ly6xwt"
+      "zone": "pek3a",
+      "image": "img-tkf29bfm"
     },
     "role": "broker",
     "count": {{cluster.broker.count}},
@@ -65,16 +55,17 @@
     },
     "replica": {{cluster.broker.replica}},
     "services": {
+      "init": {
+        "cmd": "/opt/app/bin/ctl.sh init broker"
+      },
       "start": {
-        "order": 2,
-        "cmd": "appctl start"
+        "cmd": "/opt/app/bin/ctl.sh restart broker"
       },
       "stop": {
-        "order": 2,
-        "cmd": "appctl stop"
+        "cmd": "/opt/app/bin/ctl.sh stop broker"
       },
       "restart": {
-        "cmd": "appctl restart"
+        "cmd": "/opt/app/bin/ctl.sh restart broker"
       }
     },
     "health_check": {
@@ -84,12 +75,12 @@
       "action_timeout_sec": 30,
       "healthy_threshold": 2,
       "unhealthy_threshold": 2,
-      "check_cmd": "appctl check",
-      "action_cmd": "appctl restart"
+      "check_cmd": "/opt/app/bin/ctl.sh check broker",
+      "action_cmd": "/opt/app/bin/ctl.sh restart broker"
     },
     "monitor": {
       "enable": true,
-      "cmd": "appctl measure",
+      "cmd": "/opt/app/bin/ctl.sh measure broker",
       "items": {
         "putTps": {
           "unit": "",
@@ -152,17 +143,14 @@
       "delete_when": {{env.broker.delete_when}},
       "file_reserved_time": {{env.broker.file_reserved_time}},
       "replica_mode": {{env.broker.replica_mode}},
-      "flush_disk_type": {{env.broker.flush_disk_type}},
-      "web_console_enabled": {{env.web_console_enabled}},
-      "web_console_username": {{env.web_console_username}},
-      "web_console_password": {{env.web_console_password}}
+      "flush_disk_type": {{env.broker.flush_disk_type}}
     },
     "vertical_scaling_policy": "sequential"
   }, {
     "container": {
       "type": "kvm",
-      "zone": "sh1a",
-      "image": "img-86ly6xwt"
+      "zone": "pek3a",
+      "image": "img-tkf29bfm"
     },
     "role": "console",
     "count": {{cluster.console.count}},
@@ -171,15 +159,13 @@
     "instance_class": {{cluster.console.instance_class}},
     "services": {
       "start": {
-        "order": 3,
-        "cmd": "appctl start"
+        "cmd": "/opt/app/bin/ctl.sh restart console"
       },
       "stop": {
-        "order": 1,
-        "cmd": "appctl stop"
+        "cmd": "/opt/app/bin/ctl.sh stop console"
       },
       "restart": {
-        "cmd": "appctl restart"
+        "cmd": "/opt/app/bin/ctl.sh restart console"
       }
     },
     "health_check": {
@@ -189,22 +175,19 @@
       "action_timeout_sec": 30,
       "healthy_threshold": 2,
       "unhealthy_threshold": 2,
-      "check_cmd": "appctl check",
-      "action_cmd": "appctl restart"
+      "check_cmd": "/opt/app/bin/ctl.sh check console",
+      "action_cmd": "/opt/app/bin/ctl.sh restart console"
     },
     "env": {
       "user_name": {{env.console.user_name}},
-      "user_pwd": {{env.console.user_pwd}},
-      "web_console_enabled": {{env.web_console_enabled}},
-      "web_console_username": {{env.web_console_username}},
-      "web_console_password": {{env.web_console_password}}
+      "user_pwd": {{env.console.user_pwd}}
     },
     "vertical_scaling_policy": "sequential"
   }, {
     "container": {
       "type": "kvm",
-      "zone": "sh1a",
-      "image": "img-86ly6xwt"
+      "zone": "pek3a",
+      "image": "img-tkf29bfm"
     },
     "role": "client",
     "count": {{cluster.client.count}},
@@ -214,17 +197,19 @@
     "user_access": true,
     "services": {
       "init": {
-        "cmd": "appctl initNode"
+        "cmd": "/opt/app/bin/ctl.sh init client"
       }
     }
   }],
+
   "display_tabs": {
     "brokerList": {
-      "cmd": "appctl readClusterListFromNameserver",
+      "cmd": "/opt/app/bin/ctl.sh readClusterListFrom nameserver",
       "roles_to_execute_on": ["nameserver"],
       "description": "Cluster information - broker names, broker IDs and broker addresses"
     }
   },
+
   "endpoints": {
     "nameserver": {
       "port": 9876,

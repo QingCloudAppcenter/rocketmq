@@ -1,0 +1,8 @@
+[template]
+src = "gen-conf.sh.tmpl"
+dest = "/opt/app/bin/gen-conf.sh"
+mode = "0700"
+keys = [
+  "/",
+]
+reload_cmd = "/opt/app/bin/gen-conf.sh; /opt/app/bin/ctl.sh restart broker,console"
