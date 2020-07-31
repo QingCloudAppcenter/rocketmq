@@ -55,18 +55,3 @@ generateBrokerMetrics() {
 METRICS_FILE
 }
 
-checkVolume() {
-  local hostVolumeUsed
-  hostVolumeUsed="$(df -h ${DATA_MOUNTS} | awk 'NR == 2 {print $5}')"; #" * <= 80%"
-  [[ "${hostVolumeUsed%%%}" -lt "80" ]] || return ${EC_INSUFFICIENT_VOLUME}
-}
-
-revive() {
-  local ret; ret="$(appctl check)";
-  [[ ${ret} -ge 230 && ${ret} -lt 240 ]] && log "WARN: appctl check return EC${ret}" || _revive
-}
-
-check() {
-  checkVolume;
-  _check
-}

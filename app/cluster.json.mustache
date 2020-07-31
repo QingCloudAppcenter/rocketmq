@@ -12,7 +12,7 @@
     "container": {
       "type": "lxc",
       "zone": "sh1a",
-      "image": "img-86ly6xwt"
+      "image": "img-v3j8ptj7"
     },
     "role": "nameserver",
     "count": {{cluster.nameserver.count}},
@@ -40,7 +40,7 @@
       "healthy_threshold": 2,
       "unhealthy_threshold": 2,
       "check_cmd": "appctl check",
-      "action_cmd": "appctl restart"
+      "action_cmd": "appctl revive"
     },
     "env": {
       "web_console_enabled": {{env.web_console_enabled}},
@@ -52,7 +52,7 @@
     "container": {
       "type": "lxc",
       "zone": "sh1a",
-      "image": "img-86ly6xwt"
+      "image": "img-v3j8ptj7"
     },
     "role": "broker",
     "count": {{cluster.broker.count}},
@@ -85,7 +85,7 @@
       "healthy_threshold": 2,
       "unhealthy_threshold": 2,
       "check_cmd": "appctl check",
-      "action_cmd": "appctl restart"
+      "action_cmd": "appctl revive"
     },
     "monitor": {
       "enable": true,
@@ -162,7 +162,7 @@
     "container": {
       "type": "kvm",
       "zone": "sh1a",
-      "image": "img-86ly6xwt"
+      "image": "img-v3j8ptj7"
     },
     "role": "console",
     "count": {{cluster.console.count}},
@@ -190,7 +190,7 @@
       "healthy_threshold": 2,
       "unhealthy_threshold": 2,
       "check_cmd": "appctl check",
-      "action_cmd": "appctl restart"
+      "action_cmd": "appctl revive"
     },
     "env": {
       "user_name": {{env.console.user_name}},

@@ -47,5 +47,6 @@
     "console_user_pwd": "网页控制台登陆密码，默认为 admin 当且仅当密码不为空时开启密码登陆",
     "Whether to enable log web console": "文件管理控制台开关，true=开启，默认关闭",
     "username of log web console": "文件管理控制台登陆用户名，默认admin",
-    "password of log web console": "文件管理控制台登陆密码，默认为空"
+    "password of log web console": "文件管理控制台登陆密码，默认为空",
+    "err_code230": "节点磁盘使用率超过 80%，剩余空间不足或导致服务异常，请先扩容"
 }
