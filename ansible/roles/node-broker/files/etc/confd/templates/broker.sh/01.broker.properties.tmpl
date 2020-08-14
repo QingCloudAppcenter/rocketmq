@@ -18,7 +18,7 @@ brokerId=$(( brokerId + 1 ))
   {{- end }}
 {{- end }}
 
-flush /opt/app/conf/broker/broker.properties << BROKER_CONF_EOF
+flush /opt/app/current/conf/broker/broker.properties << BROKER_CONF_EOF
 brokerClusterName = {{ getv "/env/cluster_name" "DefaultCluster" }}
 namesrvAddr = $namesvrList
 brokerIP1 = {{ getv "/host/ip" }}

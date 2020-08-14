@@ -1,0 +1,8 @@
+[template]
+src = "node.sh.tmpl"
+dest = "/opt/app/current/bin/tmpl/node.sh"
+mode = "0700"
+keys = [
+  "/",
+]
+reload_cmd = "/opt/app/current/bin/tmpl/node.sh"

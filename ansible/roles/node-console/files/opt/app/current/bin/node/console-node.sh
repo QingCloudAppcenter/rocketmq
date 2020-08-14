@@ -5,3 +5,8 @@ initNode() {
   usermod -d /data/console -u $(id -u rocketmq) rocketmq
   _initNode
 }
+
+start() {
+  execute init
+  execute _start
+}

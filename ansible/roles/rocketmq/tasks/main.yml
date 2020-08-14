@@ -86,6 +86,6 @@
     masked: yes
   loop:
   - rocketmq-broker
-  - rocketmq-nameserver
+  - rocketmq-nameServer
   loop_control:
     loop_var: svc_name

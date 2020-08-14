@@ -2,12 +2,12 @@
 {{- $halfMemory := div (getv "/host/memory") 2 }}
 {{- $namesvrPort := getv "/cluster/endpoints/nameserver/port" "9876" }}
 
-flush /opt/app/conf/console/console.env << CONSOLE_JVM_ENV
+flush /opt/app/current/conf/console/console.env << CONSOLE_JVM_ENV
 
 ROCKETMQ_HOME="/opt/rocketmq-console/current"
 JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 JAVA_OPT="-Dcom.rocketmq.sendMessageWithVIPChannel=false \
--Dlogging.config=/opt/app/conf/console/logback.xml \
+-Dlogging.config=/opt/app/current/conf/console/logback.xml \
 -XX:-UseBiasedLocking \
 -Duser.home=/data/console \
 -Xms{{ $halfMemory }}m \

@@ -8,9 +8,15 @@ setEnvVar() {
 
 initNode() {
   setEnvVar
-  usermod -d /data/console -u $(id -u rocketmq) rocketmq
+  usermod -d /data/nameserver -u $(id -u rocketmq) rocketmq
   _initNode
 }
+
+start() {
+  execute init
+  execute _start
+}
+
 
 readClusterListFromNameserver() {
   setEnvVar

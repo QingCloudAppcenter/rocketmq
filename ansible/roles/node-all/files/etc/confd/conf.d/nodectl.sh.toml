@@ -1,8 +1,8 @@
 [template]
 src = "nodectl.sh.tmpl"
-dest = "/opt/app/bin/tmpl/nodectl.sh"
+dest = "/opt/app/current/bin/tmpl/nodectl.sh"
 mode = "0700"
 keys = [
   "/",
 ]
-reload_cmd = "/opt/app/bin/tmpl/nodectl.sh"
+reload_cmd = "/opt/app/current/bin/tmpl/nodectl.sh"
