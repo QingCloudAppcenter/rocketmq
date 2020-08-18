@@ -11,10 +11,12 @@ setEnvVar() {
 }
 
 initNode() {
+  mkdir -p ${DATA_MOUNTS}
   usermod -d ${DATA_MOUNTS} -u $(id -u rocketmq) rocketmq
   # Fix permissions for attached volume.
   chown -R rocketmq.rocketmq ${DATA_MOUNTS}
   chmod -R u=rwx,g=rx,o= ${DATA_MOUNTS}
+  ln -s -f /opt/app/current/conf/caddy/index.html /data/index.html
   _initNode
 }
 
@@ -22,7 +24,6 @@ start() {
   execute init;
   execute _start
 }
-
 
 metricsFile="/data/broker/rocketmq-metrics.json"
 measure() {

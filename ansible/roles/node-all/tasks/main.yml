@@ -6,10 +6,16 @@
     group: "{{ user }}"
     state: directory
   with_items:
-    - "/data/broker"
-    - "/data/console"
-    - "/data/nameserver"
     - "/opt/app"
+
+- name: copy conf files
+  copy:
+    src: files/opt/app/
+    dest: /opt/app/
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: preserve
+    directory_mode: u=rwx,g=rx,o=
 
 - name: Replace caddy service
   replace:
@@ -19,4 +25,4 @@
 
 - name: install confd files
   include_role:
-    name: confd-files-1.0.6
+    name: confd-files-1.0.7

@@ -1,7 +1,7 @@
 {{- if getvs "/host/role" | filter "nameserver" }}
 {{- $halfMemory := div (getv "/host/memory") 2 }}
 
-flush /opt/app/current/conf/nameserver/nameserver.env << NAMESERVER_JVM_ENV
+flush /opt/app/current/conf/nameServer/nameServer.env << NAMESERVER_JVM_ENV
 
 ROCKETMQ_HOME="/opt/rocketmq/current"
 JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"

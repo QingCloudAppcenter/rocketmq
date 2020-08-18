@@ -1,4 +1,3 @@
-ln -s -f /opt/app/current/conf/caddy/index.html /data/index.html
 
 flush /opt/app/current/conf/caddy/caddyfile << CADDYFILE_EOF
 {{ getv "/host/ip" }}:80 {

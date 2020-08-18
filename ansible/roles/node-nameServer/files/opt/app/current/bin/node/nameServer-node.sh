@@ -7,16 +7,12 @@ setEnvVar() {
 }
 
 initNode() {
-  setEnvVar
+  mkdir -p -m=766 /data/nameserver
+  chown -R rocketmq:rocketmq /data/nameserver
+  ln -s -f /opt/app/current/conf/caddy/index.html /data/index.html
   usermod -d /data/nameserver -u $(id -u rocketmq) rocketmq
   _initNode
 }
-
-start() {
-  execute init
-  execute _start
-}
-
 
 readClusterListFromNameserver() {
   setEnvVar

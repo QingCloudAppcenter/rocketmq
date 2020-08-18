@@ -49,14 +49,6 @@
     mode: preserve
     directory_mode: u=rwx,g=rwx,o=
 
-- name: copy systemd files
-  copy: #拷贝service文件
-    src: files/{{ item }}
-    dest: /{{ item }}
-    directory_mode: yes
-  with_items:
-    - lib/systemd/system/
-
 - name: disable auto start
   systemd:
     name: "{{ svc_name }}"

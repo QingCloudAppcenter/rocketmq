@@ -52,14 +52,6 @@
     dest: "/etc/security/limits.d/rocketmq.conf"
     content: "rocketmq    soft  core  unlimited"
 
-- name: copy systemd files
-  copy: #拷贝service文件
-    src: files/{{ item }}
-    dest: /{{ item }}
-    directory_mode: yes
-  with_items:
-    - lib/systemd/system/
-
 - name: Replace broker nameserver start jvm_opts
   replace:
     path: "{{ item.path }}"
