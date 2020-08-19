@@ -19,6 +19,6 @@
     - rocketmq-console
     - node-console
     - node-broker
-    - node-nameServer
+    - node-namesrv
     loop_control:
       loop_var: service_name
