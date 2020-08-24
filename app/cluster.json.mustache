@@ -12,7 +12,7 @@
     "container": {
       "type": "lxc",
       "zone": "sh1a",
-      "image": "img-xviambds"
+      "image": "img-0whg50ju"
     },
     "role": "nameserver",
     "count": {{cluster.nameserver.count}},
@@ -20,6 +20,10 @@
     "memory": {{cluster.nameserver.memory}},
     "instance_class": {{cluster.nameserver.instance_class}},
     "services": {
+      "init": {
+        "order": 1,
+        "cmd": "appctl init"
+      },
       "start": {
         "order": 1,
         "cmd": "appctl start"
@@ -52,7 +56,7 @@
     "container": {
       "type": "lxc",
       "zone": "sh1a",
-      "image": "img-xviambds"
+      "image": "img-0whg50ju"
     },
     "role": "broker",
     "count": {{cluster.broker.count}},
@@ -65,6 +69,10 @@
     },
     "replica": {{cluster.broker.replica}},
     "services": {
+      "init": {
+        "order": 2,
+        "cmd": "appctl init"
+      },
       "start": {
         "order": 2,
         "cmd": "appctl start"
@@ -162,7 +170,7 @@
     "container": {
       "type": "kvm",
       "zone": "sh1a",
-      "image": "img-xviambds"
+      "image": "img-0whg50ju"
     },
     "role": "console",
     "count": {{cluster.console.count}},
@@ -170,6 +178,10 @@
     "memory": {{cluster.console.memory}},
     "instance_class": {{cluster.console.instance_class}},
     "services": {
+      "init": {
+        "order": 3,
+        "cmd": "appctl init"
+      },
       "start": {
         "order": 3,
         "cmd": "appctl start"

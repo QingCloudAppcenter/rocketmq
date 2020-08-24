@@ -20,11 +20,6 @@ initNode() {
   _initNode
 }
 
-start() {
-  execute init;
-  execute _start
-}
-
 metricsFile="/data/broker/rocketmq-metrics.json"
 measure() {
   [[ -f "${metricsFile}" ]] && cat ${metricsFile} || echo '{}'
