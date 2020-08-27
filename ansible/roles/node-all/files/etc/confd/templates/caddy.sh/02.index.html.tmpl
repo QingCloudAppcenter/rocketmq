@@ -78,7 +78,7 @@ flush /opt/app/current/conf/caddy/index.html << HTML_EOF
         {{- range $brokerNodes }}
         {{- if eq . (getv "/host/ip") }}
         <li><span>⊟</span>{{ . }}</li>
-        <li><span class="sub-1">⊞</span><a href="./broker/logs/">broker</a></li>
+        <li><span class="sub-1">⊞</span><a href="./logs/">broker</a></li>
         {{- else }}
         <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
         {{- end }}
@@ -87,7 +87,7 @@ flush /opt/app/current/conf/caddy/index.html << HTML_EOF
         {{- range  $slaveNodes }}
         {{- if eq . (getv "/host/ip") }}
         <li><span>⊟</span>{{ . }}</li>
-        <li><span class="sub-1">⊞</span><a href="./broker/logs/">broker</a></li>
+        <li><span class="sub-1">⊞</span><a href="./logs/">broker</a></li>
         {{- else }}
         <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
         {{- end }}
@@ -96,7 +96,7 @@ flush /opt/app/current/conf/caddy/index.html << HTML_EOF
         {{- range  $namesrvNodes }}
         {{- if eq . (getv "/host/ip") }}
         <li><span>⊟</span>{{ . }}</li>
-        <li><span class="sub-1">⊞</span><a href="./nameserver/logs/rocketmqlogs/">nameserver</a></li>
+        <li><span class="sub-1">⊞</span><a href="./logs/rocketmqlogs/">nameserver</a></li>
         {{- else }}
         <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
         {{- end }}
@@ -105,7 +105,7 @@ flush /opt/app/current/conf/caddy/index.html << HTML_EOF
         {{- range  $consoleNodes }}
         {{- if eq . (getv "/host/ip") }}
         <li><span>⊟</span>{{ . }}</li>
-        <li><span class="sub-1">⊞</span><a href="./console/logs/">console</a></li>
+        <li><span class="sub-1">⊞</span><a href="./logs/">console</a></li>
         {{- else }}
         <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
         {{- end }}
