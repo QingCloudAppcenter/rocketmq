@@ -7,6 +7,7 @@ setEnvVar() {
 }
 
 initNode() {
+  mkdir -p -m=766 /data/nameserver
   chown -R rocketmq:rocketmq /data/nameserver
   ln -s -f /opt/app/current/conf/caddy/index.html /data/nameserver/index.html
   usermod -d /data/nameserver -u $(id -u rocketmq) rocketmq
