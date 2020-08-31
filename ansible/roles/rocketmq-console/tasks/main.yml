@@ -95,13 +95,3 @@
     group: "{{ user }}"
     mode: preserve
     directory_mode: u=rwx,g=rwx,o=
-
-- name: disable auto start
-  systemd:
-    name: "{{ svc_name }}"
-    state: stopped
-    masked: yes
-  loop:
-  - rocketmq-console
-  loop_control:
-    loop_var: svc_name

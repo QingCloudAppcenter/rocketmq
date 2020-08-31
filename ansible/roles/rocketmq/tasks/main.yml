@@ -28,18 +28,16 @@
       target_owner: "{{ user }}"
       target_group: "{{ user }}"
       bin_path:
+      dest_path: "/opt/rocketmq/"
 
-- name: mv detail to ex-path
-  copy:
-    src: "/opt/{{ item }}/{{ mq_version }}/{{ item }}-all-{{ mq_version }}-bin-release/"
-    dest: "/opt/{{ item }}/{{ mq_version }}/"
-    owner: "{{ user }}"
-    group: "{{ user }}"
-    mode: preserve
-    remote_src: yes
-    directory_mode: u=rwx,g=rwx,o=
-  with_items:
-    - "{{ user }}"
+- name: rename file
+  shell: mv /opt/rocketmq/rocketmq-all-{{ mq_version }}-bin-release  /opt/rocketmq/{{ mq_version }}
+
+- name: set curent version symbolic link
+  file:
+    src: "/opt/rocketmq/{{ mq_version }}"
+    dest: "/opt/rocketmq/current"
+    state: link
 
 - name: install tools
   apt:
@@ -70,14 +68,3 @@
     - path: /opt/rocketmq/current/bin/runbroker.sh
       regexp: '\${GC_LOG_DIR}'
       replace: '/data/broker/logs'
-
-- name: disable auto start
-  systemd:
-    name: "{{ svc_name }}"
-    state: stopped
-    masked: yes
-  loop:
-  - rocketmq-broker
-  - rocketmq-namesrv
-  loop_control:
-    loop_var: svc_name
