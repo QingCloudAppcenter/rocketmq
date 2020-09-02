@@ -4,9 +4,9 @@
     src: files/opt/app/
     dest: /opt/app/
     owner: "{{ user }}"
-    group: "{{ user }}"
+    group: "svc"
     mode: preserve
-    directory_mode: u=rwx,g=rx,o=
+    directory_mode: u=rwx,g=rwx,o=r
 
 - name: install confd files
   include_role:

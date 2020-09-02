@@ -1,18 +1,10 @@
 ---
-- name: Add the Service Group
-  group:
-    name: "{{ user }}"
-    state: present
-
-- name: Add the Service User
-  user:
-    name: "{{ user }}"
-    groups: "{{ user }}"
-    shell: /sbin/nologin
-    create_home: no
-    append: yes
-    comment: "RocketMQ Service User"
-    state: present
+- name: prepare service user
+  include_role:
+    name: create-service-user-1.0.0
+  vars:
+    svc_user: rocketmq
+    svc_group: svc
 
 - name: install mq from binary release
   include_role:
@@ -26,7 +18,7 @@
       extracts: yes
       creates: "bin/mqbroker"
       target_owner: "{{ user }}"
-      target_group: "{{ user }}"
+      target_group: "svc"
       bin_path:
       dest_path: "/opt/rocketmq/"
 
@@ -44,11 +36,6 @@
     update_cache: yes
     name: ['openjdk-8-jdk','jq']
     state: present
-
-- name: set security limits
-  copy:
-    dest: "/etc/security/limits.d/rocketmq.conf"
-    content: "rocketmq    soft  core  unlimited"
 
 - name: Replace broker nameserver start jvm_opts
   replace:
@@ -68,3 +55,12 @@
     - path: /opt/rocketmq/current/bin/runbroker.sh
       regexp: '\${GC_LOG_DIR}'
       replace: '/data/broker/logs'
+
+- name: copy conf files
+  copy:
+    src: files/opt/app/
+    dest: /opt/app/
+    owner: "{{ user }}"
+    group: "svc"
+    mode: preserve
+    directory_mode: u=rwx,g=rwx,o=r

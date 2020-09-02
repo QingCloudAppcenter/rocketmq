@@ -1,0 +1,17 @@
+[Unit]
+Description=RocketMQ Nameserver
+After=network.target
+
+[Service]
+Type=simple
+User=rocketmq
+Group=svc
+LimitCORE=infinity
+LimitNOFILE=infinity
+EnvironmentFile=/opt/app/current/conf/namesrv/namesrv.env
+ExecStart=/opt/rocketmq/current/bin/mqnamesrv
+ExecStop=/opt/rocketmq/current/bin/mqshutdown namesrv
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -6,6 +6,7 @@ flush /opt/app/current/conf/console/console.env << CONSOLE_JVM_ENV
 
 ROCKETMQ_HOME="/opt/rocketmq-console/current"
 JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+NAMESRV_ADDR="{{ range $i, $ip := getvs "/hosts/nameserver/*/ip" }}{{ if $i }};{{ end }}{{ $ip }}:{{ $namesvrPort }}{{ end }}"
 JAVA_OPT="-Dcom.rocketmq.sendMessageWithVIPChannel=false \
 -Dlogging.config=/opt/app/current/conf/console/logback.xml \
 -XX:-UseBiasedLocking \
@@ -25,6 +26,8 @@ JAVA_OPT="-Dcom.rocketmq.sendMessageWithVIPChannel=false \
 -XX:NumberOfGCLogFiles=5 \
 -XX:GCLogFileSize=2m "
 
-ENABLE_LOGIN_PWD="--rocketmq.config.loginRequired={{- with getv "/env/user_pwd" "" }}true{{- else }}false{{- end }}"
-NAME_SERVER_LIST="--rocketmq.config.namesrvAddr={{ range $i, $ip := getvs "/hosts/nameserver/*/ip" }}{{ if $i }};{{ end }}{{ $ip }}:{{ $namesvrPort }}{{- end }}"
+#rocketmq.config.dataPath compiled with static /opt/app/current/conf/console
+#rocketmq.config.loginRequired=true
+CONSOLE_OPTS="--rocketmq.config.loginRequired={{ with getv "/env/user_pwd" "" }}true{{ else }}false{{ end }}"
+
 CONSOLE_JVM_ENV

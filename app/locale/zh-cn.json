@@ -44,9 +44,13 @@
     "When to delete the commitlog which is out of the reserve time": "清除过期数据文件（commitlog）的时间，以 24 小时制（整点）表示",
     "SYNC_FLUSH: broker flushes each message onto disk before acknowledging producer; ASYNC_FLUSH: broker takes advantage of group-committing, achieving better performance": "消息数据持久化（刷盘）模式，SYNC（同步模式）：每条消息成功写入磁盘后才通知客户端；ASYNC（异步模式）：消息批量写到磁盘，可以有更好的性能",
     "console_user_name": "网页控制台用户名，默认为 admin 拥有管理者权限",
-    "console_user_pwd": "网页控制台登陆密码，默认为 admin 当且仅当密码不为空时开启密码登陆",
+    "console_user_pwd": "网页控制台登陆密码，默认为 password 当且仅当密码不为空时开启密码登陆",
     "Whether to enable log web console": "文件管理控制台开关，true=开启，默认关闭",
     "username of log web console": "文件管理控制台登陆用户名，默认admin",
     "password of log web console": "文件管理控制台登陆密码，默认为空",
-    "err_code230": "节点磁盘使用率超过 80%，剩余空间不足或导致服务异常，请先扩容"
+    "err_code230": "节点磁盘使用率超过 80%，剩余空间不足或导致服务异常，请先扩容",
+    "Test": "测试环境",
+    "Prod": "生产环境",
+    "resource_group": "资源控制组",
+    "Test: 1 master/slave node with 1 nameserver node ; Prod: 3 master/slave node with 2 nameserver nodes": "测试环境：2核2G Broker及slave节点 x 1，1核1G客户端节点 x 1，1核1G名称服务器节点 x 1，1核1G网页控制台节点 x 1；生产环境：4核8G Broker及slave节点 x 3，1核1G客户端节点 x 1，2核4G名称服务器节点 x 2，2核2G网页控制台节点 x 1"
 }

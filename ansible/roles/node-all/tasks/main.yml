@@ -3,25 +3,35 @@
   file:
     path: "{{ item }}"
     owner: "{{ user }}"
-    group: "{{ user }}"
+    group: "svc"
     state: directory
   with_items:
     - "/opt/app"
+
+- name: Add the user to svc
+  user:
+    name: "{{ item }}"
+    groups: "svc"
+    append: yes
+  with_items:
+    - "caddy"
+    - "root"
 
 - name: copy conf files
   copy:
     src: files/opt/app/
     dest: /opt/app/
     owner: "{{ user }}"
-    group: "{{ user }}"
+    group: "svc"
     mode: preserve
-    directory_mode: u=rwx,g=rx,o=
+    directory_mode: u=rwx,g=rwx,o=r
 
-- name: Replace caddy service
-  replace:
-    path: "/lib/systemd/system/caddy.service"
-    regexp: '=caddy'
-    replace: '={{ user }}'
+- name: set JAVA_HOME
+  copy:
+    dest: /etc/environment
+    content: |
+      JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+      PATH="$JAVA_HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 
 - name: install confd files
   include_role:

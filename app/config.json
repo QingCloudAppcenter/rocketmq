@@ -26,6 +26,13 @@
       "default": "",
       "required": "yes"
     }, {
+      "key": "resource_group",
+      "label": "Resource Configuration",
+      "description": "Test: 1 master/slave node with 1 nameserver node ; Prod: 3 master/slave node with 2 nameserver nodes",
+      "type": "string",
+      "default": "Prod",
+      "range": ["Test", "Prod"]
+  }, {
       "key": "nameserver",
       "label": "Name Server",
       "description": "Properties for name server",
@@ -37,6 +44,7 @@
         "type": "integer",
         "default": 1,
         "range": [1, 2, 4, 8, 16],
+        "resource_group": [1, 2],
         "required": "yes"
       }, {
         "key": "memory",
@@ -45,6 +53,7 @@
         "type": "integer",
         "default": 2048,
         "range": [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072],
+        "resource_group": [1024, 4096],
         "required": "yes"
       }, {
         "key": "instance_class",
@@ -53,6 +62,7 @@
         "type": "integer",
         "default": 0,
         "range": [0, 1],
+        "resource_group": [0, 1],
         "required": "yes"
       }, {
         "key": "count",
@@ -61,6 +71,7 @@
         "type": "integer",
         "default": 2,
         "min": 1,
+        "resource_group": [1, 2],
         "required": "yes"
       }]
     }, {
@@ -75,6 +86,7 @@
         "type": "integer",
         "default": 1,
         "range": [1, 2, 4, 8, 16],
+        "resource_group": [2, 4],
         "required": "yes"
       }, {
         "key": "memory",
@@ -83,6 +95,7 @@
         "type": "integer",
         "default": 2048,
         "range": [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072],
+        "resource_group": [2048, 8192],
         "required": "yes"
       }, {
         "key": "instance_class",
@@ -91,6 +104,7 @@
         "type": "integer",
         "default": 1,
         "range": [0, 1],
+        "resource_group": [0, 1],
         "required": "yes"
       }, {
         "key": "count",
@@ -99,6 +113,7 @@
         "type": "integer",
         "default": 2,
         "min": 1,
+        "resource_group": [1, 3],
         "required": "yes"
       }, {
         "key": "volume_size",
@@ -127,6 +142,7 @@
         "type": "integer",
         "default": 1,
         "range": [1, 2, 4, 8, 16],
+        "resource_group": [1, 2],
         "required": "yes"
       }, {
         "key": "memory",
@@ -135,6 +151,7 @@
         "type": "integer",
         "default": 1024,
         "range": [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072],
+        "resource_group": [1024, 2048],
         "required": "yes"
       }, {
         "key": "instance_class",
@@ -143,6 +160,7 @@
         "type": "integer",
         "default": 0,
         "range": [0, 1],
+        "resource_group": [0, 1],
         "required": "yes"
       }, {
         "key": "count",
@@ -151,6 +169,7 @@
         "type": "integer",
         "default": 1,
         "range": [0, 1],
+        "resource_group": [1, 1],
         "required": "yes"
       }]
     }, {
@@ -189,6 +208,7 @@
         "type": "integer",
         "default": 1,
         "range": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        "resource_group": [1, 1],
         "required": "yes"
       }]
     }]

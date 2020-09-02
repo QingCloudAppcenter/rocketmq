@@ -1,7 +1,7 @@
 ---
 - name: Create local cache Directories
   file:
-    path: "{{ local_cache_path }}/rocketmq"
+    path: "{{ local_cache_path }}/rocketmq-externals"
     state: directory
     owner: root
     group: root
@@ -12,14 +12,14 @@
 
 - name: check if package file exists
   stat:
-    path: "/tmp/rocketmq-externals-master/rocketmq-console"
+    path: "{{ local_cache_path }}/rocketmq-externals/rocketmq-console"
   register: cached_file
   run_once: True
   delegate_to: localhost
 
 - name: check if jar file exists
   stat:
-    path: "{{ local_cache_path }}/rocketmq/rocketmq-console-{{ console_version }}.jar"
+    path: "{{ local_cache_path }}/rocketmq-externals/rocketmq-console/target/rocketmq-console-ng-{{ console_version }}.jar"
   register: jar_file
   run_once: True
   delegate_to: localhost
@@ -27,12 +27,24 @@
 - name: download src code from github
   git:
     repo: 'https://github.com/apache/rocketmq-externals.git'
-    dest: /tmp/rocketmq-externals-master
+    dest: "{{ local_cache_path }}/rocketmq-externals"
     update: no
   run_once: True
   delegate_to: localhost
   when:
   - cached_file.stat.exists == False and jar_file.stat.exists == False
+
+- name: Replace console compile var
+  replace:
+    path: "{{ local_cache_path }}/rocketmq-externals/rocketmq-console/src/main/resources/application.properties"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  with_items:
+    - regexp: '/tmp/rocketmq-console/data'
+      replace: '/opt/app/current/conf/console'
+    - regexp: '=false'
+      replace: '=true'
+  delegate_to: localhost
 
 - name: compile jar by container
   docker_container:
@@ -43,7 +55,7 @@
     recreate: yes
     working_dir: /usr/src/rocketmq-console
     volumes:
-      - /tmp/rocketmq-externals-master/rocketmq-console:/usr/src/rocketmq-console
+      - "{{ local_cache_path }}/rocketmq-externals/rocketmq-console:/usr/src/rocketmq-console"
   delegate_to: localhost
   when:
   - cached_file.stat.exists == True and jar_file.stat.exists == False
@@ -51,27 +63,15 @@
 - name: wait for jar finish compile
   wait_for:
     timeout: 7200
-    path: "/tmp/rocketmq-externals-master/rocketmq-console/target/rocketmq-console-ng-{{ console_version }}.jar"
+    path: "{{ local_cache_path }}/rocketmq-externals/rocketmq-console/target/rocketmq-console-ng-{{ console_version }}.jar"
     state: present
   delegate_to: localhost
-
-- name: copy jar to local_cache_path
-  copy:
-    src: "/tmp/rocketmq-externals-master/rocketmq-console/target/rocketmq-console-ng-{{ console_version }}.jar"
-    dest: "{{ local_cache_path }}/rocketmq/rocketmq-console-{{ console_version }}.jar"
-    owner: root
-    group: root
-    mode: preserve
-    directory_mode: u=rwx,g=rx,o=
-  delegate_to: localhost
-  when:
-  - jar_file.stat.exists == False
 
 - name: prepare service directories
   file:
     path: "/opt/{{ item }}"
     owner: "{{ user }}"
-    group: "{{ user }}"
+    group: "svc"
     state: directory
   with_items:
     - "rocketmq-console/{{ console_version }}"
@@ -81,7 +81,7 @@
     src: "/opt/{{ item.name }}/{{ item.version }}"
     dest: /opt/{{ item.name }}/current
     owner: "{{ user }}"
-    group: "{{ user }}"
+    group: "svc"
     state: link
   with_items:
     - name: rocketmq-console
@@ -89,9 +89,18 @@
 
 - name: install console jar
   copy:
-    src: "{{ local_cache_path }}/rocketmq/rocketmq-console-{{ console_version }}.jar"
+    src: "{{ local_cache_path }}/rocketmq-externals/rocketmq-console/target/rocketmq-console-ng-{{ console_version }}.jar"
     dest: "/opt/rocketmq-console/{{ console_version }}/rocketmq-console.jar"
     owner: "{{ user }}"
-    group: "{{ user }}"
+    group: "svc"
     mode: preserve
-    directory_mode: u=rwx,g=rwx,o=
+    directory_mode: u=rwx,g=rw,o=r
+
+- name: copy conf files
+  copy:
+    src: files/opt/app/
+    dest: /opt/app/
+    owner: "{{ user }}"
+    group: "svc"
+    mode: preserve
+    directory_mode: u=rwx,g=rwx,o=r

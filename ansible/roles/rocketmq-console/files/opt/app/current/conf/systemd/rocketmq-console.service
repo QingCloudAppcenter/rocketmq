@@ -1,0 +1,15 @@
+[Unit]
+Description=RocketMQ Console
+After=network.target
+
+[Service]
+Type=simple
+User=rocketmq
+Group=svc
+EnvironmentFile=/opt/app/current/conf/console/console.env
+ExecStart=/bin/bash -c 'java $JAVA_OPT -jar /opt/rocketmq-console/current/rocketmq-console.jar "${CONSOLE_OPTS}"'
+KillMode=process
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
