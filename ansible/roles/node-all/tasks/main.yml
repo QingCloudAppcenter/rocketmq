@@ -17,15 +17,6 @@
     - "caddy"
     - "root"
 
-- name: copy conf files
-  copy:
-    src: files/opt/app/
-    dest: /opt/app/
-    owner: "{{ user }}"
-    group: "svc"
-    mode: preserve
-    directory_mode: u=rwx,g=rwx,o=r
-
 - name: set JAVA_HOME
   copy:
     dest: /etc/environment
