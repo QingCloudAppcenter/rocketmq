@@ -8,21 +8,11 @@
   with_items:
     - "/opt/app"
 
-- name: Add the user to svc
-  user:
-    name: "{{ item }}"
-    groups: "svc"
-    append: yes
-  with_items:
-    - "caddy"
-    - "root"
-
 - name: set JAVA_HOME
   copy:
-    dest: /etc/environment
+    dest: /etc/profile.d/java-path.sh
     content: |
-      JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-      PATH="$JAVA_HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+      PATH="$PATH:/usr/lib/jvm/java-8-openjdk-amd64/bin"
 
 - name: install confd files
   include_role:
