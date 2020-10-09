@@ -16,6 +16,7 @@
     - caddy-1.1.7
     - rocketmq
     - node-all
+    - node-client
     - rocketmq-console
     - node-console
     - node-broker

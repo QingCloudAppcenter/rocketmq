@@ -5,7 +5,6 @@
 flush /opt/app/current/conf/console/console.env << CONSOLE_JVM_ENV
 
 ROCKETMQ_HOME="/opt/rocketmq-console/current"
-JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 NAMESRV_ADDR="{{ range $i, $ip := getvs "/hosts/nameserver/*/ip" }}{{ if $i }};{{ end }}{{ $ip }}:{{ $namesvrPort }}{{ end }}"
 JAVA_OPT="-Dcom.rocketmq.sendMessageWithVIPChannel=false \
 -Dlogging.config=/opt/app/current/conf/console/logback.xml \

@@ -42,8 +42,8 @@
   with_items:
     - regexp: '/tmp/rocketmq-console/data'
       replace: '/opt/app/current/conf/console'
-    - regexp: '=false'
-      replace: '=true'
+    - regexp: 'loginRequired=false'
+      replace: 'loginRequired=true'
   delegate_to: localhost
 
 - name: compile jar by container

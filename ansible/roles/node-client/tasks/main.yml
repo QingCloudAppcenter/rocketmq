@@ -7,7 +7,3 @@
     group: "svc"
     mode: preserve
     directory_mode: u=rwx,g=rx,o=r
-
-- name: install confd files
-  include_role:
-    name: confd-files-1.0.8

@@ -3,10 +3,9 @@
 ###################
 
 initNode() {
-  mkdir -p -m=774 /data/nameserver
+  mkdir -p -m=754 /data/nameserver
   chown -R rocketmq:svc /data/nameserver
   ln -s -f /opt/app/current/conf/caddy/index.html /data/nameserver/index.html
-  usermod -d /data/nameserver -u $(id -u rocketmq) rocketmq
   _initNode
 }
 
