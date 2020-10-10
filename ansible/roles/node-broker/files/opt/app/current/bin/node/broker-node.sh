@@ -8,7 +8,7 @@ EC_UNHEALTHY=240
 initNode() {
   # Fix permissions for attached volume.
   chown -R rocketmq.svc ${DATA_MOUNTS}
-  chmod u=rwx,g=rx,o=r ${DATA_MOUNTS}
+  chmod 750 ${DATA_MOUNTS}
   ln -s -f /opt/app/current/conf/caddy/index.html ${DATA_MOUNTS}/index.html
   _initNode
 }

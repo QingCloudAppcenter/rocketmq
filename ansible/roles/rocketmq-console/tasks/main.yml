@@ -94,7 +94,7 @@
     owner: "{{ user }}"
     group: "svc"
     mode: preserve
-    directory_mode: u=rwx,g=rw,o=r
+    directory_mode: u=rwx,g=rw,o=
 
 - name: copy conf files
   copy:
@@ -103,4 +103,4 @@
     owner: "{{ user }}"
     group: "svc"
     mode: preserve
-    directory_mode: u=rwx,g=rwx,o=r
+    directory_mode: u=rwx,g=rwx,o=

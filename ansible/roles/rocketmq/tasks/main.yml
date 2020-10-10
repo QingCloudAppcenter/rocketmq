@@ -63,4 +63,4 @@
     owner: "{{ user }}"
     group: "svc"
     mode: preserve
-    directory_mode: u=rwx,g=rwx,o=r
+    directory_mode: u=rwx,g=rwx,o=

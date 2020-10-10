@@ -10,7 +10,7 @@
 
 - name: set JAVA_HOME
   copy:
-    dest: /etc/profile.d/java-path.sh
+    dest: /opt/app/current/bin/envs/java.env
     content: |
       JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 

@@ -6,7 +6,7 @@
     owner: "{{ user }}"
     group: "svc"
     mode: preserve
-    directory_mode: u=rwx,g=rx,o=r
+    directory_mode: u=rwx,g=rx,o=
 
 - name: install confd files
   include_role:
