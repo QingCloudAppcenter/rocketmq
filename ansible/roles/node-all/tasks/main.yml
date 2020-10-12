@@ -2,7 +2,7 @@
 - name: prepare service directories
   file:
     path: "{{ item }}"
-    owner: "{{ user }}"
+    owner: "rocketmq"
     group: "svc"
     state: directory
   with_items:

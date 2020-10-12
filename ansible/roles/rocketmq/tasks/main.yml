@@ -17,7 +17,7 @@
       pkg_url: "https://mirrors.tuna.tsinghua.edu.cn/apache/rocketmq/{{ mq_version }}/rocketmq-all-{{ mq_version }}-bin-release.zip"
       extracts: yes
       creates: "bin/mqbroker"
-      target_owner: "{{ user }}"
+      target_owner: "rocketmq"
       target_group: "svc"
       bin_path:
       dest_path: "/opt/rocketmq/"
@@ -60,7 +60,7 @@
   copy:
     src: files/opt/app/
     dest: /opt/app/
-    owner: "{{ user }}"
+    owner: "rocketmq"
     group: "svc"
     mode: preserve
     directory_mode: "750"
