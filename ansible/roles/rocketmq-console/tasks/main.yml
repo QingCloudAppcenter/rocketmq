@@ -5,7 +5,7 @@
     state: directory
     owner: root
     group: root
-    mode: "0750"
+    mode: "750"
     recurse: yes
   run_once: True
   delegate_to: localhost
