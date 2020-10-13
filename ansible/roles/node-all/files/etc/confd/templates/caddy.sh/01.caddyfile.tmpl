@@ -1,0 +1,12 @@
+
+flush /opt/app/current/conf/caddy/caddyfile << CADDYFILE_EOF
+{{ getv "/host/ip" }}:80 {
+  {{- with getv "/env/web_console_password" "" }}
+  basicauth / "{{ getv "/env/web_console_username" "admin" }}"  "{{ . }}"
+  {{- end }}
+  root /data/{{ if getvs "/host/role" | filter "broker*" }}broker{{ else }}{{ getv "/host/role" }}{{ end }}
+  gzip
+  browse /
+  tls off
+}
+CADDYFILE_EOF

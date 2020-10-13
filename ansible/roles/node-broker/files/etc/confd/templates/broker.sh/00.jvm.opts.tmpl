@@ -1,0 +1,17 @@
+{{- if getvs "/host/role" | filter "(broker|broker-replica)" }}
+
+{{- $halfMemory := div (getv "/host/memory") 2 }}
+flush /opt/app/current/conf/broker/broker.env << BROKER_JVM_ENV
+
+ROCKETMQ_HOME="/opt/rocketmq/current"
+JAVA_OPT="-server \
+-XX:-UseBiasedLocking \
+-Duser.home=/data/broker \
+-Xms{{ $halfMemory }}m \
+-Xmx{{ $halfMemory }}m \
+-XX:+ExitOnOutOfMemoryError \
+-XX:ErrorFile=/data/broker/logs/rocketmqlogs/hs_err.log \
+-XX:+PrintClassHistogram \
+-XX:+PrintTenuringDistribution "
+
+BROKER_JVM_ENV

@@ -1,0 +1,8 @@
+[template]
+src = "broker.sh.tmpl"
+dest = "/opt/app/current/bin/tmpl/broker.sh"
+mode = "0700"
+keys = [
+  "/",
+]
+reload_cmd = "/opt/app/current/bin/tmpl/broker.sh; appctl reload rocketmq-broker"

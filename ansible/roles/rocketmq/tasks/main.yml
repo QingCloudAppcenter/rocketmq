@@ -1,0 +1,66 @@
+---
+- name: prepare service user
+  include_role:
+    name: create-service-user-1.0.0
+  vars:
+    svc_user: rocketmq
+    svc_group: svc
+
+- name: install mq from binary release
+  include_role:
+    name: install-1.0.5
+  vars:
+    opts:
+      pkg_name: rocketmq
+      pkg_version: "{{ mq_version }}"
+      pkg_type: zip
+      pkg_url: "https://mirrors.tuna.tsinghua.edu.cn/apache/rocketmq/{{ mq_version }}/rocketmq-all-{{ mq_version }}-bin-release.zip"
+      extracts: yes
+      creates: "bin/mqbroker"
+      target_owner: "rocketmq"
+      target_group: "svc"
+      bin_path:
+      dest_path: "/opt/rocketmq/"
+
+- name: rename file
+  shell: mv /opt/rocketmq/rocketmq-all-{{ mq_version }}-bin-release  /opt/rocketmq/{{ mq_version }}
+
+- name: set curent version symbolic link
+  file:
+    src: "/opt/rocketmq/{{ mq_version }}"
+    dest: "/opt/rocketmq/current"
+    state: link
+
+- name: install tools
+  apt:
+    update_cache: yes
+    name: ['openjdk-8-jdk','jq']
+    state: present
+
+- name: Replace broker nameserver start jvm_opts
+  replace:
+    path: "{{ item.path }}"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  with_items:
+    - path: /opt/rocketmq/current/bin/runserver.sh
+      regexp: '-server -Xms4g -Xmx4g -Xmn2g'
+      replace: ''
+    - path: /opt/rocketmq/current/bin/runserver.sh
+      regexp: '\${GC_LOG_DIR}'
+      replace: '/data/nameserver/logs'
+    - path: /opt/rocketmq/current/bin/runbroker.sh
+      regexp: '-server -Xms8g -Xmx8g -Xmn4g'
+      replace: ''
+    - path: /opt/rocketmq/current/bin/runbroker.sh
+      regexp: '\${GC_LOG_DIR}'
+      replace: '/data/broker/logs'
+
+- name: copy conf files
+  copy:
+    src: files/opt/app/
+    dest: /opt/app/
+    owner: "rocketmq"
+    group: "svc"
+    mode: preserve
+    directory_mode: "750"

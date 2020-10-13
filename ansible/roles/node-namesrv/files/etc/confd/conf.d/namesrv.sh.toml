@@ -1,0 +1,8 @@
+[template]
+src = "namesrv.sh.tmpl"
+dest = "/opt/app/current/bin/tmpl/namesrv.sh"
+mode = "0700"
+keys = [
+  "/",
+]
+reload_cmd = "/opt/app/current/bin/tmpl/namesrv.sh; appctl reload rocketmq-namesrv"

@@ -1,0 +1,316 @@
+{
+  "type": "array",
+  "properties": [{
+    "key": "cluster",
+    "description": "cluster properties",
+    "type": "array",
+    "properties": [{
+      "key": "name",
+      "type": "string",
+      "label": "Name",
+      "description": "The name of the RocketMQ service",
+      "default": "RocketMQ",
+      "required": "no"
+    }, {
+      "key": "description",
+      "type": "string",
+      "label": "Description",
+      "description": "The description of the RocketMQ service",
+      "default": "",
+      "required": "no"
+    }, {
+      "key": "vxnet",
+      "label": "VxNet",
+      "description": "Choose a vxnet to join",
+      "type": "string",
+      "default": "",
+      "required": "yes"
+    }, {
+      "key": "resource_group",
+      "label": "Resource Configuration",
+      "description": "Test: 1 master/slave node with 1 nameserver node ; Prod: 3 master/slave node with 2 nameserver nodes",
+      "type": "string",
+      "default": "Prod",
+      "range": ["Test", "Prod"]
+  }, {
+      "key": "nameserver",
+      "label": "Name Server",
+      "description": "Properties for name server",
+      "type": "array",
+      "properties": [{
+        "key": "cpu",
+        "label": "CPU",
+        "description": "CPUs of each node",
+        "type": "integer",
+        "default": 1,
+        "range": [1, 2, 4, 8, 16],
+        "resource_group": [1, 2],
+        "required": "yes"
+      }, {
+        "key": "memory",
+        "label": "Memory",
+        "description": "Memory of each node (in MiB)",
+        "type": "integer",
+        "default": 2048,
+        "range": [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072],
+        "resource_group": [1024, 4096],
+        "required": "yes"
+      }, {
+        "key": "instance_class",
+        "label": "Instance Class",
+        "description": "The instance type for the cluster to run, such as high performance, high performance plus",
+        "type": "integer",
+        "default": 0,
+        "range": [0, 1],
+        "resource_group": [0, 1],
+        "required": "yes"
+      }, {
+        "key": "count",
+        "label": "Node Count",
+        "description": "Number of nodes",
+        "type": "integer",
+        "default": 2,
+        "min": 1,
+        "resource_group": [1, 2],
+        "required": "yes"
+      }]
+    }, {
+      "key": "broker",
+      "label": "Broker",
+      "description": "Properties for broker",
+      "type": "array",
+      "properties": [{
+        "key": "cpu",
+        "label": "CPU",
+        "description": "CPUs of each node",
+        "type": "integer",
+        "default": 1,
+        "range": [1, 2, 4, 8, 16],
+        "resource_group": [2, 4],
+        "required": "yes"
+      }, {
+        "key": "memory",
+        "label": "Memory",
+        "description": "Memory of each node (in MiB)",
+        "type": "integer",
+        "default": 2048,
+        "range": [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072],
+        "resource_group": [2048, 8192],
+        "required": "yes"
+      }, {
+        "key": "instance_class",
+        "label": "Instance Class",
+        "description": "The instance type for the cluster to run, such as high performance, high performance plus",
+        "type": "integer",
+        "default": 1,
+        "range": [0, 1],
+        "resource_group": [0, 1],
+        "required": "yes"
+      }, {
+        "key": "count",
+        "label": "Master Node Count",
+        "description": "Number of master nodes",
+        "type": "integer",
+        "default": 2,
+        "min": 1,
+        "resource_group": [1, 3],
+        "required": "yes"
+      }, {
+        "key": "volume_size",
+        "label": "Volume Size",
+        "description": "The volume size for each node",
+        "type": "integer",
+        "default": 10,
+        "required": "yes"
+      }, {
+        "key": "replica",
+        "label": "Replica Count",
+        "description": "The replica count for each node",
+        "type": "integer",
+        "default": 1,
+        "required": "yes"
+      }]
+    }, {
+      "key": "console",
+      "label": "Console",
+      "description": "Properties for console",
+      "type": "array",
+      "properties": [{
+        "key": "cpu",
+        "label": "CPU",
+        "description": "CPUs of each node",
+        "type": "integer",
+        "default": 1,
+        "range": [1, 2, 4, 8, 16],
+        "resource_group": [1, 2],
+        "required": "yes"
+      }, {
+        "key": "memory",
+        "label": "Memory",
+        "description": "Memory of each node (in MiB)",
+        "type": "integer",
+        "default": 1024,
+        "range": [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072],
+        "resource_group": [1024, 2048],
+        "required": "yes"
+      }, {
+        "key": "instance_class",
+        "label": "Instance Class",
+        "description": "The instance type for the cluster to run, such as high performance, high performance plus",
+        "type": "integer",
+        "default": 0,
+        "range": [0, 1],
+        "resource_group": [0, 1],
+        "required": "yes"
+      }, {
+        "key": "count",
+        "label": "Node Count",
+        "description": "Number of nodes",
+        "type": "integer",
+        "default": 1,
+        "range": [0, 1],
+        "resource_group": [1, 1],
+        "required": "yes"
+      }]
+    }, {
+      "key": "client",
+      "label": "Client",
+      "description": "Properties for client",
+      "type": "array",
+      "properties": [{
+        "key": "cpu",
+        "label": "CPU",
+        "description": "CPUs of each node",
+        "type": "integer",
+        "default": 1,
+        "range": [1, 2, 4, 8, 16],
+        "required": "yes"
+      }, {
+        "key": "memory",
+        "label": "Memory",
+        "description": "Memory of each node (in MiB)",
+        "type": "integer",
+        "default": 1024,
+        "range": [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072],
+        "required": "yes"
+      }, {
+        "key": "instance_class",
+        "label": "Instance Class",
+        "description": "The instance type for the cluster to run, such as high performance, high performance plus",
+        "type": "integer",
+        "default": 0,
+        "range": [0, 1],
+        "required": "yes"
+      }, {
+        "key": "count",
+        "label": "Node Count",
+        "description": "Number of nodes",
+        "type": "integer",
+        "default": 1,
+        "range": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+        "resource_group": [1, 1],
+        "required": "yes"
+      }]
+    }]
+  }, {
+    "key": "env",
+    "description": "Application configuration properties",
+    "type": "array",
+    "properties": [{
+      "key": "web_console_enabled",
+      "label": "Switch of log web console",
+      "description": "Whether to enable log web console",
+      "type": "boolean",
+      "default": false,
+      "required": "no"
+      }, {
+      "key": "web_console_username",
+      "label": "Username of log web console",
+      "description": "username of log web console",
+      "type": "string",
+      "pattern": "^([a-z0-9.-]+)?$",
+      "default": "admin",
+      "required": "no"
+      }, {
+      "key": "web_console_password",
+      "label": "Password of log web console",
+      "description": "password of log web console",
+      "type": "password",
+      "pattern": "^\\w{0,24}$",
+      "default": "",
+      "required": "no"
+      }, {
+      "key": "broker",
+      "description": "The broker configuration properties",
+      "type": "array",
+      "properties": [{
+        "key": "cluster_name",
+        "label": "brokerClusterName",
+        "description": "Cluster name",
+        "type": "string",
+        "changeable": true,
+        "default": "DefaultCluster",
+        "required": "no"
+      }, {
+        "key": "file_reserved_time",
+        "label": "fileReservedTime",
+        "description": "The number of hours to keep a commitlog before deleting it",
+        "type": "integer",
+        "changeable": true,
+        "min": 1,
+        "default": 72,
+        "required": "no"
+      }, {
+        "key": "delete_when",
+        "label": "deleteWhen",
+        "description": "When to delete the commitlog which is out of the reserve time",
+        "type": "integer",
+        "changeable": true,
+        "min": 0,
+        "max": 23,
+        "default": 4,
+        "required": "no"
+      }, {
+        "key": "replica_mode",
+        "label": "Broker Replication Mode",
+        "description": "Replication mode",
+        "type": "string",
+        "changeable": true,
+        "range": ["ASYNC", "SYNC"],
+        "default": "SYNC",
+        "required": "yes"
+      }, {
+        "key": "flush_disk_type",
+        "label": "flushDiskType",
+        "description": "SYNC_FLUSH: broker flushes each message onto disk before acknowledging producer; ASYNC_FLUSH: broker takes advantage of group-committing, achieving better performance",
+        "type": "string",
+        "changeable": true,
+        "range": ["ASYNC_FLUSH", "SYNC_FLUSH"],
+        "default": "ASYNC_FLUSH",
+        "required": "no"
+      }]
+    }, {
+      "key": "console",
+      "description": "The console configuration properties",
+      "type": "array",
+      "properties": [{
+        "key": "user_name",
+        "label": "console.user_name",
+        "description": "console_user_name",
+        "type": "string",
+        "changeable": true,
+        "default": "admin",
+        "required": "no"
+      }, {
+        "key": "user_pwd",
+        "label": "console.user_pwd",
+        "description": "console_user_pwd",
+        "type": "password",
+        "changeable": true,
+        "default": "password",
+        "pattern": "^([a-zA-Z0-9_!#%^&*()./;]{6,}|)$",
+        "required": "no"
+      }]
+    }]
+  }]
+}

@@ -1,0 +1,25 @@
+---
+- name: common setup
+  hosts: all
+  strategy: free
+  vars:
+    target_env: "{{ lookup('env', 'target') }}"
+  tasks:
+  - include_role:
+      name: "{{ service_name }}"
+    loop:
+    - disable-apt-jobs-1.0.0
+    - disable-motd-1.0.0
+    - app-agent-1.0.6
+    - appctl-1.2.2
+    - arping-1.0.0
+    - caddy-1.1.7
+    - rocketmq
+    - node-all
+    - node-client
+    - rocketmq-console
+    - node-console
+    - node-broker
+    - node-namesrv
+    loop_control:
+      loop_var: service_name

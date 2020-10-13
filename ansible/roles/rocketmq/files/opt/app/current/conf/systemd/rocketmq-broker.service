@@ -1,0 +1,18 @@
+[Unit]
+Description=RocketMQ Broker
+After=network.target
+
+[Service]
+Type=simple
+User=rocketmq
+Group=svc
+LimitCORE=infinity
+LimitNOFILE=infinity
+EnvironmentFile=/opt/app/current/bin/envs/java.env
+EnvironmentFile=/opt/app/current/conf/broker/broker.env
+ExecStart=/opt/rocketmq/current/bin/mqbroker -c /opt/app/current/conf/broker/broker.properties
+ExecStop=/opt/rocketmq/current/bin/mqshutdown broker
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

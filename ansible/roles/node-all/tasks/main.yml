@@ -1,0 +1,19 @@
+---
+- name: prepare service directories
+  file:
+    path: "{{ item }}"
+    owner: "rocketmq"
+    group: "svc"
+    state: directory
+  with_items:
+    - "/opt/app"
+
+- name: set JAVA_HOME
+  copy:
+    dest: /opt/app/current/bin/envs/java.env
+    content: |
+      JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+
+- name: install confd files
+  include_role:
+    name: confd-files-1.0.8
