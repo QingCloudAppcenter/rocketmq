@@ -7,7 +7,6 @@
     "Memory": "内存",
     "Memory of each node (in MiB)": "每个节点的内存",
     "Instance Class": "实例类型",
-    "The instance type for the cluster to run, such as high performance, high performance plus": "性能型主机或超高性能型",
     "Node Count": "节点数量",
     "Number of nodes": "节点数量",
     "Volume Size": "挂盘容量",
