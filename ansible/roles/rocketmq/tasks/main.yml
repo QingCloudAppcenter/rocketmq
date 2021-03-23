@@ -14,7 +14,7 @@
       pkg_name: rocketmq
       pkg_version: "{{ mq_version }}"
       pkg_type: zip
-      pkg_url: "https://mirrors.tuna.tsinghua.edu.cn/apache/rocketmq/{{ mq_version }}/rocketmq-all-{{ mq_version }}-bin-release.zip"
+      pkg_url: "https://archive.apache.org/dist/rocketmq/{{ mq_version }}/rocketmq-all-{{ mq_version }}-bin-release.zip"
       extracts: yes
       creates: "bin/mqbroker"
       target_owner: "rocketmq"
