@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+myPath="$0"
+
+cleanUp() {
+  local rc=$?
+  [ "$rc" -eq 0 ] || echo "# Failed ($rc)! Please check confd logs." >> $myPath
+  return $rc
+}
+
+trap cleanUp EXIT
+
+rotate() {
+  local path=$1 maxFilesCount=5
+  for i in $(seq 1 $maxFilesCount | tac); do
+    if [ -f "${path}.$i" ]; then mv ${path}.$i ${path}.$(($i+1)); fi
+  done
+  if [ -f "$path" ]; then cp $path ${path}.1; fi
+}
+
+flush() {
+  local targetFile=$1
+  if [ -n "$targetFile" ]; then
+    rotate $targetFile
+    cat > $targetFile -
+  else
+    cat -
+  fi
+}
+
+applyEnvs() {
+  local f; for f in $(find /opt/app/current/bin/envs/ -name appdev.env -o -name confd.env); do . $f; done
+}
+
+applyScripts() {
+  local f; for f in $(find /opt/app/current/bin/node/ -name confd.sh); do . $f; done
+}
+
+applyEnvs
+applyScripts
+
+set -eo pipefail
+if [ "$APPCTL_ENV" == "dev" ]; then set -x; fi
+
+{{- if getvs "/host/role" | filter "(broker|broker-replica)" }}
+
+{{- $halfMemory := div (getv "/host/memory") 2 }}
+flush /opt/app/current/conf/broker/broker.env << BROKER_JVM_ENV
+
+ROCKETMQ_HOME="/opt/rocketmq/current"
+JAVA_OPT="-server \
+-XX:-UseBiasedLocking \
+-Duser.home=/data/broker \
+-Xms{{ $halfMemory }}m \
+-Xmx{{ $halfMemory }}m \
+-XX:+ExitOnOutOfMemoryError \
+-XX:ErrorFile=/data/broker/logs/rocketmqlogs/hs_err.log \
+-XX:+PrintClassHistogram \
+-XX:+PrintTenuringDistribution "
+
+BROKER_JVM_ENV
+
+{{ $groupId := getv "/host/gid" -}}
+{{ $nodeRole := getv "/host/role" }}
+{{ $brokerPort := getv "/cluster/endpoints/broker/port" "10911" }}
+{{ $namesvrPort := getv "/cluster/endpoints/nameserver/port" "9876" }}
+namesvrList="{{- range $i, $ip := getvs "/hosts/nameserver/*/ip" }}{{ if $i }};{{ end }}{{ $ip }}:{{ $namesvrPort }}{{- end }}"
+{{ range getvs "/host/role" | filter "broker*" -}}
+{{ $isMaster := eq . "broker" -}}
+brokerId=0
+{{- if not $isMaster }}
+  {{- $nodeSid := getv "/host/sid" }}
+  {{- range $nodeId := lsdir "/hosts/broker-replica" }}
+
+    {{- if eq (getv (printf "/hosts/broker-replica/%s/gid" $nodeId)) $groupId }}
+      {{- if le (getv (printf "/hosts/broker-replica/%s/sid" $nodeId)) $nodeSid }}
+brokerId=$(( brokerId + 1 ))
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+flush /opt/app/current/conf/broker/broker.properties << BROKER_CONF_EOF
+brokerClusterName = {{ getv "/env/cluster_name" "DefaultCluster" }}
+namesrvAddr = $namesvrList
+brokerIP1 = {{ getv "/host/ip" }}
+listenPort = {{ $brokerPort }}
+brokerName = broker-{{ $groupId }}
+brokerId = ${brokerId}
+storePathCommitLog = /data/broker/commitlog/
+storePathConsumerQueue = /data/broker/consumequeue/
+deleteWhen = {{ getv "/env/delete_when" "4" }}
+fileReservedTime = {{ getv "/env/file_reserved_time" "72" }}
+brokerRole = {{ if $isMaster }}{{ getv "/env/replica_mode" "SYNC" }}_MASTER{{ else }}SLAVE{{ end }}
+flushDiskType = {{ getv "/env/flush_disk_type" "ASYNC_FLUSH" }}
+
+BROKER_CONF_EOF
+{{- end }}
+{{- end }}
+

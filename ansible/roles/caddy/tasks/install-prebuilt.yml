@@ -1,0 +1,15 @@
+---
+- name: install caddy
+  include_role:
+    name: install
+  vars:
+    opts:
+      pkg_name: caddy
+      pkg_version: "{{ caddy_version }}"
+      pkg_type: tgz
+      pkg_url: https://github.com/caddyserver/caddy/releases/download/v{{ caddy_version }}/caddy_v{{ caddy_version }}_linux_amd64.tar.gz
+      extracts: yes
+      extra_opts: []
+      creates: caddy
+      local_path: prebuilt
+      bin_path:

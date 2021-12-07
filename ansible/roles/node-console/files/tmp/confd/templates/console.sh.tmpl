@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+myPath="$0"
+
+cleanUp() {
+  local rc=$?
+  [ "$rc" -eq 0 ] || echo "# Failed ($rc)! Please check confd logs." >> $myPath
+  return $rc
+}
+
+trap cleanUp EXIT
+
+rotate() {
+  local path=$1 maxFilesCount=5
+  for i in $(seq 1 $maxFilesCount | tac); do
+    if [ -f "${path}.$i" ]; then mv ${path}.$i ${path}.$(($i+1)); fi
+  done
+  if [ -f "$path" ]; then cp $path ${path}.1; fi
+}
+
+flush() {
+  local targetFile=$1
+  if [ -n "$targetFile" ]; then
+    rotate $targetFile
+    cat > $targetFile -
+  else
+    cat -
+  fi
+}
+
+applyEnvs() {
+  local f; for f in $(find /opt/app/current/bin/envs/ -name appdev.env -o -name confd.env); do . $f; done
+}
+
+applyScripts() {
+  local f; for f in $(find /opt/app/current/bin/node/ -name confd.sh); do . $f; done
+}
+
+applyEnvs
+applyScripts
+
+set -eo pipefail
+if [ "$APPCTL_ENV" == "dev" ]; then set -x; fi
+
+{{- if getvs "/host/role" | filter "console" }}
+{{- $halfMemory := div (getv "/host/memory") 2 }}
+{{- $namesvrPort := getv "/cluster/endpoints/nameserver/port" "9876" }}
+
+flush /opt/app/current/conf/console/console.env << CONSOLE_JVM_ENV
+
+ROCKETMQ_HOME="/opt/rocketmq-console/current"
+NAMESRV_ADDR="{{ range $i, $ip := getvs "/hosts/nameserver/*/ip" }}{{ if $i }};{{ end }}{{ $ip }}:{{ $namesvrPort }}{{ end }}"
+JAVA_OPT="-Dcom.rocketmq.sendMessageWithVIPChannel=false \
+-Dlogging.config=/opt/app/current/conf/console/logback.xml \
+-XX:-UseBiasedLocking \
+-Duser.home=/data/console \
+-Xms{{ $halfMemory }}m \
+-Xmx{{ $halfMemory }}m \
+-XX:+ExitOnOutOfMemoryError \
+-XX:ErrorFile=/data/console/logs/consolelogs/hs_err.log \
+-XX:+PrintGCDetails \
+-XX:+PrintGCTimeStamps \
+-XX:+PrintGCDateStamps \
+-XX:+PrintClassHistogram \
+-XX:+PrintTenuringDistribution \
+-XX:+PrintGCApplicationStoppedTime \
+-Xloggc:/data/console/logs/consolelogs/gc.log \
+-XX:+UseGCLogFileRotation \
+-XX:NumberOfGCLogFiles=5 \
+-XX:GCLogFileSize=2m "
+
+#rocketmq.config.dataPath compiled with static /opt/app/current/conf/console
+#rocketmq.config.loginRequired=true
+CONSOLE_OPTS="--rocketmq.config.loginRequired={{ with getv "/env/user_pwd" "" }}true{{ else }}false{{ end }}"
+
+CONSOLE_JVM_ENV
+
+flush /opt/app/current/conf/console/users.properties << CONSOLE_PROPERTIES_EOF
+
+# https://github.com/apache/rocketmq-externals/blob/master/rocketmq-console/src/main/resources/users.properties
+# admin=admin,1
+{{- with getv "/env/user_pwd" "" }}
+{{ getv "/env/user_name" "admin" }}={{ . }},1
+{{- end }}
+CONSOLE_PROPERTIES_EOF
+
+{{- end }}
+

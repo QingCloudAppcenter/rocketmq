@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+myPath="$0"
+
+cleanUp() {
+  local rc=$?
+  [ "$rc" -eq 0 ] || echo "# Failed ($rc)! Please check confd logs." >> $myPath
+  return $rc
+}
+
+trap cleanUp EXIT
+
+rotate() {
+  local path=$1 maxFilesCount=5
+  for i in $(seq 1 $maxFilesCount | tac); do
+    if [ -f "${path}.$i" ]; then mv ${path}.$i ${path}.$(($i+1)); fi
+  done
+  if [ -f "$path" ]; then cp $path ${path}.1; fi
+}
+
+flush() {
+  local targetFile=$1
+  if [ -n "$targetFile" ]; then
+    rotate $targetFile
+    cat > $targetFile -
+  else
+    cat -
+  fi
+}
+
+applyEnvs() {
+  local f; for f in $(find /opt/app/current/bin/envs/ -name appdev.env -o -name confd.env); do . $f; done
+}
+
+applyScripts() {
+  local f; for f in $(find /opt/app/current/bin/node/ -name confd.sh); do . $f; done
+}
+
+applyEnvs
+applyScripts
+
+set -eo pipefail
+if [ "$APPCTL_ENV" == "dev" ]; then set -x; fi
+
+
+flush /opt/app/current/bin/envs/node.env << NODE_ENV_EOF
+MY_IP={{ getv "/host/ip" }}
+MY_ROLE={{ getv "/host/role" }}
+CLUSTER_ID={{ getv "/cluster/cluster_id" }}
+SID={{ getv "/host/sid" "1"}}
+MY_ID={{ getv "/host/instance_id" }}
+GID={{ getv "/host/gid" }}
+BROKER_PORT={{ getv "/cluster/endpoints/broker/port" "10911" }}
+{{- $namesvrPort := getv "/cluster/endpoints/nameserver/port" "9876" }}
+NAME_SERVER_LIST="{{ range $i, $ip := getvs "/hosts/nameserver/*/ip" }}{{ if $i }};{{ end }}{{ $ip }}:{{ $namesvrPort }}{{ end }}"
+MASTER_NODES="$(echo "
+{{- range lsdir "/hosts/broker" }}
+{{ getv (printf "/hosts/broker/%s/gid" .) }}/{{ getv (printf "/hosts/broker/%s/sid" .) }}/{{ getv (printf "/hosts/broker/%s/instance_id" .) }}/{{ getv (printf "/hosts/broker/%s/ip" .) }}
+{{- end }}
+" | xargs -n1 | sort -V | xargs)"
+SLAVE_NODES="$(echo "
+{{- range lsdir "/hosts/broker-replica" }}
+{{ getv (printf "/hosts/broker-replica/%s/gid" .) }}/{{ getv (printf "/hosts/broker-replica/%s/sid" .) }}/{{ getv (printf "/hosts/broker-replica/%s/instance_id" .) }}/{{ getv (printf "/hosts/broker-replica/%s/ip" .) }}
+{{- end }}
+" | xargs -n1 | sort -V | xargs)"
+
+NODE_ENV_EOF
+

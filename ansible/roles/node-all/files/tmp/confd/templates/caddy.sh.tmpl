@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+
+myPath="$0"
+
+cleanUp() {
+  local rc=$?
+  [ "$rc" -eq 0 ] || echo "# Failed ($rc)! Please check confd logs." >> $myPath
+  return $rc
+}
+
+trap cleanUp EXIT
+
+rotate() {
+  local path=$1 maxFilesCount=5
+  for i in $(seq 1 $maxFilesCount | tac); do
+    if [ -f "${path}.$i" ]; then mv ${path}.$i ${path}.$(($i+1)); fi
+  done
+  if [ -f "$path" ]; then cp $path ${path}.1; fi
+}
+
+flush() {
+  local targetFile=$1
+  if [ -n "$targetFile" ]; then
+    rotate $targetFile
+    cat > $targetFile -
+  else
+    cat -
+  fi
+}
+
+applyEnvs() {
+  local f; for f in $(find /opt/app/current/bin/envs/ -name appdev.env -o -name confd.env); do . $f; done
+}
+
+applyScripts() {
+  local f; for f in $(find /opt/app/current/bin/node/ -name confd.sh); do . $f; done
+}
+
+applyEnvs
+applyScripts
+
+set -eo pipefail
+if [ "$APPCTL_ENV" == "dev" ]; then set -x; fi
+
+
+flush /opt/app/current/bin/envs/svc-caddy.env << CADDY_ENV_EOF
+{{- if ne (getvs "/host/role") "client" }}
+SERVICES="\$SERVICES caddy/{{ getv "/env/web_console_enabled" "false" }}/http:80"
+{{- end }}
+CADDY_ENV_EOF
+
+
+flush /opt/app/current/conf/caddy/caddyfile << CADDYFILE_EOF
+{{ getv "/host/ip" }}:80 {
+  {{- with getv "/env/web_console_password" "" }}
+  basicauth / "{{ getv "/env/web_console_username" "admin" }}"  "{{ . }}"
+  {{- end }}
+  root /data/{{ if getvs "/host/role" | filter "broker*" }}broker{{ else }}{{ getv "/host/role" }}{{ end }}
+  gzip
+  browse /
+  tls off
+}
+CADDYFILE_EOF
+
+flush /opt/app/current/conf/caddy/index.html << HTML_EOF
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body, ul {
+        margin: 0;
+        padding: 0;
+      }
+
+      header {
+        background: #f2f2f2;
+        font-family: sans-serif;
+        font-size: 1.2em;
+        height: 3.2em;
+        line-height: 3.2em;
+        padding-left: 5%;
+      }
+
+      .meta {
+        border-bottom: 1px solid #9c9c9c;
+        font-family: Verdana; sans-serif;
+        font-size: 12px;
+        line-height: 44px;
+        padding-left: 5%;
+      }
+
+      .listing {
+        list-style-type: none;
+      }
+
+      .listing>li {
+        border-bottom: 1px solid #dadada;
+        font-family: sans-serif;
+        font-size: 14px;
+        line-height: 36px;
+        padding-left: 5%;
+      }
+
+      .listing>li.header {
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 46px;
+      }
+
+      .listing>li>span {
+        margin-right: 1em;
+      }
+
+      .listing>li>span.sub-1 {
+        margin-left: 1em;
+      }
+
+      .listing>li>a {
+        color: #006ed3;
+      }
+
+      footer {
+        font-size: 12px;
+        line-height: 72px;
+        text-align: center;
+      }
+    </style>
+    <title>Files</title>
+  </head>
+  <body>
+    <header>文件查看器</header>
+    <main>
+      {{- $brokerNodes :=  getvs "/hosts/broker/*/ip" }}
+      {{- $slaveNodes :=  getvs "/hosts/broker-replica/*/ip" }}
+      {{- $namesrvNodes :=  getvs "/hosts/nameserver/*/ip" }}
+      {{- $consoleNodes :=  getvs "/hosts/console/*/ip" }}
+      <div class="meta">
+        <span>共 <b>{{ len $brokerNodes }}</b> 个 broker 主节点, <b>{{ len $slaveNodes }}</b> 个 broker 从节点, <b>{{ len $namesrvNodes }}</b> 个 nameserver 节点, <b>{{ len $consoleNodes }}</b> 个 console 节点 </span>
+      </div>
+      <ul class="listing">
+        <li class="header"> broker 主节点/目录</li>
+        {{- range $brokerNodes }}
+        {{- if eq . (getv "/host/ip") }}
+        <li><span>⊟</span>{{ . }}</li>
+        <li><span class="sub-1">⊞</span><a href="./logs/">broker</a></li>
+        {{- else }}
+        <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
+        {{- end }}
+        {{- end }}
+        <li class="header"> broker 从节点/目录</li>
+        {{- range  $slaveNodes }}
+        {{- if eq . (getv "/host/ip") }}
+        <li><span>⊟</span>{{ . }}</li>
+        <li><span class="sub-1">⊞</span><a href="./logs/">broker</a></li>
+        {{- else }}
+        <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
+        {{- end }}
+        {{- end }}
+        <li class="header"> nameserver 节点/目录</li>
+        {{- range  $namesrvNodes }}
+        {{- if eq . (getv "/host/ip") }}
+        <li><span>⊟</span>{{ . }}</li>
+        <li><span class="sub-1">⊞</span><a href="./logs/rocketmqlogs/">nameserver</a></li>
+        {{- else }}
+        <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
+        {{- end }}
+        {{- end }}
+        <li class="header"> console 节点/目录</li>
+        {{- range  $consoleNodes }}
+        {{- if eq . (getv "/host/ip") }}
+        <li><span>⊟</span>{{ . }}</li>
+        <li><span class="sub-1">⊞</span><a href="./logs/">console</a></li>
+        {{- else }}
+        <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
+        {{- end }}
+        {{- end }}
+      </ul>
+    </main>
+    <footer>
+      Served with <a rel="noopener noreferrer" href="https://caddyserver.com">Caddy</a>
+    </footer>
+  </body>
+</html>
+HTML_EOF
+

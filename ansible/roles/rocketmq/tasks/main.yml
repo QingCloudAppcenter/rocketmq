@@ -1,14 +1,14 @@
 ---
 - name: prepare service user
   include_role:
-    name: create-service-user-1.0.0
+    name: create-service-user
   vars:
     svc_user: rocketmq
     svc_group: svc
 
 - name: install mq from binary release
   include_role:
-    name: install-1.0.5
+    name: install
   vars:
     opts:
       pkg_name: rocketmq
@@ -23,7 +23,7 @@
       dest_path: "/opt/rocketmq/"
 
 - name: rename file
-  shell: mv /opt/rocketmq/rocketmq-all-{{ mq_version }}-bin-release  /opt/rocketmq/{{ mq_version }}
+  shell: rsync -a /opt/rocketmq/rocketmq-all-{{ mq_version }}-bin-release/  /opt/rocketmq/{{ mq_version }}
 
 - name: set curent version symbolic link
   file:

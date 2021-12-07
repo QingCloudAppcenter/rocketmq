@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+myPath="$0"
+
+cleanUp() {
+  local rc=$?
+  [ "$rc" -eq 0 ] || echo "# Failed ($rc)! Please check confd logs." >> $myPath
+  return $rc
+}
+
+trap cleanUp EXIT
+
+rotate() {
+  local path=$1 maxFilesCount=5
+  for i in $(seq 1 $maxFilesCount | tac); do
+    if [ -f "${path}.$i" ]; then mv ${path}.$i ${path}.$(($i+1)); fi
+  done
+  if [ -f "$path" ]; then cp $path ${path}.1; fi
+}
+
+flush() {
+  local targetFile=$1
+  if [ -n "$targetFile" ]; then
+    rotate $targetFile
+    cat > $targetFile -
+  else
+    cat -
+  fi
+}
+
+applyEnvs() {
+  local f; for f in $(find /opt/app/current/bin/envs/ -name appdev.env -o -name confd.env); do . $f; done
+}
+
+applyScripts() {
+  local f; for f in $(find /opt/app/current/bin/node/ -name confd.sh); do . $f; done
+}
+
+applyEnvs
+applyScripts
+
+set -eo pipefail
+if [ "$APPCTL_ENV" == "dev" ]; then set -x; fi
+
+flush /opt/app/current/bin/envs/nodectl.env << NODE_ENV_EOF
+
+{{- if getvs "/host/role" | filter "broker*" }}
+SERVICES="\$SERVICES rocketmq-broker/true/tcp:{{ getv "/cluster/endpoints/broker/port" "10911" }}"
+NODE_CTL="broker-node"
+DATA_MOUNTS="/data/broker"
+{{- else if getvs "/host/role" | filter "nameserver" }}
+SERVICES="\$SERVICES rocketmq-namesrv/true/tcp:{{ getv "/cluster/endpoints/nameserver/port" "9876" }}"
+NODE_CTL="namesrv-node"
+DATA_MOUNTS=""
+{{- else if getvs "/host/role" | filter "console" }}
+SERVICES="\$SERVICES rocketmq-console/true/http:8080"
+NODE_CTL="console-node"
+DATA_MOUNTS=""
+{{- else if getvs "/host/role" | filter "client" }}
+SERVICES="\$SERVICES ssh/true/tcp:22"
+NODE_CTL="client-node"
+DATA_MOUNTS=""
+{{- end }}
+NODE_ENV_EOF
+

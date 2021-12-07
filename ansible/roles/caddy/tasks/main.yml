@@ -1,0 +1,38 @@
+---
+- set_fact:
+    caddy_version: "{{ version | d(default_version) }}"
+
+- name: prepare service user
+  include_role:
+    name: create-service-user
+  vars:
+    svc_user: caddy
+
+- name: compile with plugins
+  include_tasks: compile-and-install.yml
+  when: caddy_plugins is defined
+
+- name: download official prebuilt package
+  include_tasks: install-prebuilt.yml
+  when: caddy_plugins is undefined
+
+- name: transfer files
+  copy:
+    src: "{{ role_path }}/files/opt/app/"
+    dest: /opt/app/
+    owner: root
+    group: svc
+    mode: preserve
+
+- name: link systemd files
+  file:
+    src: /opt/app/current/conf/systemd/caddy.service
+    dest: /lib/systemd/system/caddy.service
+    state: link
+
+- name: mask caddy service
+  systemd:
+    name: caddy
+    enabled: no
+    masked: yes
+    state: stopped

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+myPath="$0"
+
+cleanUp() {
+  local rc=$?
+  [ "$rc" -eq 0 ] || echo "# Failed ($rc)! Please check confd logs." >> $myPath
+  return $rc
+}
+
+trap cleanUp EXIT
+
+rotate() {
+  local path=$1 maxFilesCount=5
+  for i in $(seq 1 $maxFilesCount | tac); do
+    if [ -f "${path}.$i" ]; then mv ${path}.$i ${path}.$(($i+1)); fi
+  done
+  if [ -f "$path" ]; then cp $path ${path}.1; fi
+}
+
+flush() {
+  local targetFile=$1
+  if [ -n "$targetFile" ]; then
+    rotate $targetFile
+    cat > $targetFile -
+  else
+    cat -
+  fi
+}
+
+applyEnvs() {
+  local f; for f in $(find /opt/app/current/bin/envs/ -name appdev.env -o -name confd.env); do . $f; done
+}
+
+applyScripts() {
+  local f; for f in $(find /opt/app/current/bin/node/ -name confd.sh); do . $f; done
+}
+
+applyEnvs
+applyScripts
+
+set -eo pipefail
+if [ "$APPCTL_ENV" == "dev" ]; then set -x; fi
+
+{{- if getvs "/host/role" | filter "nameserver" }}
+{{- $halfMemory := div (getv "/host/memory") 2 }}
+
+flush /opt/app/current/conf/namesrv/namesrv.env << NAMESERVER_JVM_ENV
+
+ROCKETMQ_HOME="/opt/rocketmq/current"
+JAVA_OPT="-server \
+-XX:-UseBiasedLocking \
+-Duser.home=/data/nameserver \
+-Xms{{ $halfMemory }}m \
+-Xmx{{ $halfMemory }}m \
+-XX:+ExitOnOutOfMemoryError \
+-XX:ErrorFile=/data/nameserver/logs/hs_err.log \
+-XX:+PrintClassHistogram \
+-XX:+PrintTenuringDistribution "
+
+NAMESERVER_JVM_ENV
+{{- end }}
+

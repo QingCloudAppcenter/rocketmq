@@ -1,0 +1,42 @@
+---
+- name: define vars
+  set_fact:
+    work_dir: "{{ role_path | regex_replace('-[0-9.]+$', '') }}/files/tmp/with-upload-module"
+
+- name: prepare tmp compile dir
+  file:
+    path: "{{ work_dir }}"
+    state: directory
+  delegate_to: localhost
+  run_once: True
+
+- name: compile Caddy with upload module
+  vars:
+    target_file: "{{ work_dir }}/caddy-{{ caddy_version }}"
+  args:
+    chdir: "{{ work_dir }}"
+    creates: "{{ target_file }}"
+  environment:
+    GO111MODULE: "on"
+    CADDY_VERSION: "{{ caddy_version }}"
+    CADDY_UPLOAD_VERSION: "{{ mod_upload_version }}"
+    TARGET_FILE: "{{ target_file }}"
+  local_action: command bash {{ role_path }}/files/compile.sh
+  run_once: True
+
+- name: prepare binary directory
+  file:
+    path: /opt/caddy/{{ caddy_version }}
+    state: directory
+
+- name: link binary dir
+  file:
+    src: "{{ caddy_version }}"
+    dest: /opt/caddy/current
+    state: link
+
+- name: install
+  copy:
+    src: "{{ work_dir }}/caddy-{{ caddy_version }}"
+    dest: /opt/caddy/current/caddy
+    mode: 755

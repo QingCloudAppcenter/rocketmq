@@ -1,0 +1,29 @@
+---
+- name: set up variables
+  set_fact:
+    app_agent_version: 1.0.6
+
+- name: install packages
+  include_role:
+    name: install
+  vars:
+    opts:
+      pkg_name: app-agent
+      pkg_version: "{{ app_agent_version }}"
+      dest_path: /tmp/app-agent
+      pkg_url: https://github.com/QingCloudAppcenter/AppcenterAgent/releases/download/v{{ app_agent_version }}/app-agent-linux-amd64.tar.gz
+      pkg_type: tgz
+      extracts: yes
+      creates: bin
+
+- name: install app agent
+  shell:
+    cmd: ./install.sh
+    chdir: /tmp/app-agent
+    creates: /opt/qingcloud/app-agent/bin/confd
+
+- name: adjust logrotate
+  replace:
+    path: /etc/logrotate.d/app-agent
+    regexp: '^(\s+size).*'
+    replace: '\1 2M'
