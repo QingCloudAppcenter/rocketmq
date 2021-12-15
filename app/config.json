@@ -131,48 +131,6 @@
         "required": "yes"
       }]
     }, {
-      "key": "console",
-      "label": "Console",
-      "description": "Properties for console",
-      "type": "array",
-      "properties": [{
-        "key": "cpu",
-        "label": "CPU",
-        "description": "CPUs of each node",
-        "type": "integer",
-        "default": 1,
-        "range": [1, 2, 4, 8, 16],
-        "resource_group": [1, 2],
-        "required": "yes"
-      }, {
-        "key": "memory",
-        "label": "Memory",
-        "description": "Memory of each node (in MiB)",
-        "type": "integer",
-        "default": 1024,
-        "range": [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072],
-        "resource_group": [1024, 2048],
-        "required": "yes"
-      }, {
-        "key": "instance_class",
-        "label": "Instance Class",
-        "description": "",
-        "type": "integer",
-        "default": 0,
-        "range": [0, 1],
-        "resource_group": [0, 1],
-        "required": "yes"
-      }, {
-        "key": "count",
-        "label": "Node Count",
-        "description": "Number of nodes",
-        "type": "integer",
-        "default": 1,
-        "range": [0, 1],
-        "resource_group": [1, 1],
-        "required": "yes"
-      }]
-    }, {
       "key": "client",
       "label": "Client",
       "description": "Properties for client",

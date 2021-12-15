@@ -15,6 +15,7 @@
     path: "{{ local_cache_path }}/rocketmq-externals/rocketmq-console"
   register: cached_file
   run_once: True
+  delegate_to: localhost
 
 - name: check if jar file exists
   stat:
@@ -26,15 +27,14 @@
 - name: extract rocketmq-external
   unarchive:
     src: "https://github.com/apache/rocketmq-externals/archive/5c48ed165d2e85a01e88b074ac14608a09e85a47.zip"
-    dest: "/tmp/"
+    dest: "/tmp"
     remote_src: yes
+  delegate_to: localhost
   when:
   - cached_file.stat.exists == False and jar_file.stat.exists == False
 
 - name: mv file to local_cache
-  shell: rsync -a /tmp/rocketmq-externals-5c48ed165d2e85a01e88b074ac14608a09e85a47/* {{ local_cache_path }}/rocketmq-externals
-  when:
-  - cached_file.stat.exists == False and jar_file.stat.exists == False
+  shell: rsync -a -p /tmp/rocketmq-externals-5c48ed165d2e85a01e88b074ac14608a09e85a47/ {{ local_cache_path }}/rocketmq-externals
 
 - name: Replace console compile var
   replace:
@@ -46,7 +46,7 @@
       replace: '/opt/app/current/conf/console'
     - regexp: 'loginRequired=false'
       replace: 'loginRequired=true'
-      delegate_to: localhost
+  delegate_to: localhost
 
 - name: check docker-ce status
   apt:
@@ -79,21 +79,21 @@
     volumes:
       - "{{ local_cache_path }}/rocketmq-externals/rocketmq-console:/usr/src/rocketmq-console"
   delegate_to: localhost
-  when:
-  - cached_file.stat.exists == True and jar_file.stat.exists == False
-
-- name: wait for jar finish compile
-  wait_for:
-    timeout: 7200
-    path: "{{ local_cache_path }}/rocketmq-externals/rocketmq-console/target/rocketmq-console-ng-{{ console_version }}.jar"
-    state: present
-  delegate_to: localhost
+  #  when:
+          #  - cached_file.stat.exists == True and jar_file.stat.exists == False
 
 - name: stop docker
   systemd:
     name: docker
     state: stopped
     enabled: no
+  delegate_to: localhost
+
+- name: wait for jar finish compile
+  wait_for:
+    timeout: 7200
+    path: "{{ local_cache_path }}/rocketmq-externals/rocketmq-console/target/rocketmq-console-ng-{{ console_version }}.jar"
+    state: present
   delegate_to: localhost
 
 - name: prepare service directories

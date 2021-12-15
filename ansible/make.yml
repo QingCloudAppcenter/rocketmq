@@ -18,7 +18,6 @@
     - node-all
     - node-client
     - rocketmq-console
-    - node-console
     - node-broker
     - node-namesrv
     loop_control:

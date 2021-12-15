@@ -4,15 +4,11 @@
   "vxnet": {{cluster.vxnet}},
   "multi_zone_policy": "round_robin",
   "advanced_actions": ["change_vxnet", "scale_horizontal"],
-  "upgrade_policy": [
-    "appv-md9fjdpf"
-  ],
-  "upgrading_policy": "parallel",
   "nodes": [{
     "container": {
       "type": "lxc",
-      "zone": "sh1a",
-      "image": "img-pe1c1r7s"
+      "zone": "ap2a",
+      "image": "img-aky2ckgg"
     },
     "role": "nameserver",
     "count": {{cluster.nameserver.count}},
@@ -55,8 +51,8 @@
   }, {
     "container": {
       "type": "lxc",
-      "zone": "sh1a",
-      "image": "img-pe1c1r7s"
+      "zone": "ap2a",
+      "image": "img-aky2ckgg"
     },
     "role": "broker",
     "count": {{cluster.broker.count}},
@@ -169,14 +165,15 @@
   }, {
     "container": {
       "type": "kvm",
-      "zone": "sh1a",
-      "image": "img-pe1c1r7s"
+      "zone": "ap2a",
+      "image": "img-aky2ckgg"
     },
-    "role": "console",
-    "count": {{cluster.console.count}},
-    "cpu": {{cluster.console.cpu}},
-    "memory": {{cluster.console.memory}},
-    "instance_class": {{cluster.console.instance_class}},
+    "role": "client",
+    "count": {{cluster.client.count}},
+    "cpu": {{cluster.client.cpu}},
+    "memory": {{cluster.client.memory}},
+    "instance_class": {{cluster.client.instance_class}},
+    "user_access": true,
     "services": {
       "init": {
         "order": 3,
@@ -212,23 +209,6 @@
       "web_console_password": {{env.web_console_password}}
     },
     "vertical_scaling_policy": "sequential"
-  }, {
-    "container": {
-      "type": "kvm",
-      "zone": "sh1a",
-      "image": "img-pe1c1r7s"
-    },
-    "role": "client",
-    "count": {{cluster.client.count}},
-    "cpu": {{cluster.client.cpu}},
-    "memory": {{cluster.client.memory}},
-    "instance_class": {{cluster.client.instance_class}},
-    "user_access": true,
-    "services": {
-      "init": {
-        "cmd": "appctl initNode"
-      }
-    }
   }],
   "display_tabs": {
     "brokerList": {
