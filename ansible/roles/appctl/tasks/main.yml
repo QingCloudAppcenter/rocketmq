@@ -21,7 +21,7 @@
     dest: /opt/app/current/
     owner: root
     group: svc
-    mode: preserve
+    mode: "755"
     directory_mode: u=rwx,g=rx,o=
 
 - name: create symbolic link

@@ -5,9 +5,16 @@
     dest: /opt/app/
     owner: "rocketmq"
     group: "svc"
-    mode: preserve
+    mode: "755"
     directory_mode: "750"
 
 - name: install confd files
   include_role:
     name: confd-files
+
+- name: link tools shell
+  file:
+    src: /opt/app/current/conf/namesrv/logback_namesrv.xml
+    dest: /opt/rocketmq/current/conf/logback_namesrv.xml
+    state: link
+    force: yes

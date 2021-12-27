@@ -128,7 +128,7 @@ flush /opt/app/current/conf/caddy/index.html << HTML_EOF
     <title>Files</title>
   </head>
   <body>
-    <header>文件查看器</header>
+    <header>日志查看器</header>
     <main>
       {{- $brokerNodes :=  getvs "/hosts/broker/*/ip" }}
       {{- $slaveNodes :=  getvs "/hosts/broker-replica/*/ip" }}
@@ -142,7 +142,7 @@ flush /opt/app/current/conf/caddy/index.html << HTML_EOF
         {{- range $brokerNodes }}
         {{- if eq . (getv "/host/ip") }}
         <li><span>⊟</span>{{ . }}</li>
-        <li><span class="sub-1">⊞</span><a href="./logs/">broker</a></li>
+        <li><span class="sub-1">⊞</span><a href="./log/">broker</a></li>
         {{- else }}
         <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
         {{- end }}
@@ -151,7 +151,7 @@ flush /opt/app/current/conf/caddy/index.html << HTML_EOF
         {{- range  $slaveNodes }}
         {{- if eq . (getv "/host/ip") }}
         <li><span>⊟</span>{{ . }}</li>
-        <li><span class="sub-1">⊞</span><a href="./logs/">broker</a></li>
+        <li><span class="sub-1">⊞</span><a href="./log/">broker</a></li>
         {{- else }}
         <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
         {{- end }}
@@ -160,7 +160,7 @@ flush /opt/app/current/conf/caddy/index.html << HTML_EOF
         {{- range  $namesrvNodes }}
         {{- if eq . (getv "/host/ip") }}
         <li><span>⊟</span>{{ . }}</li>
-        <li><span class="sub-1">⊞</span><a href="./logs/rocketmqlogs/">nameserver</a></li>
+        <li><span class="sub-1">⊞</span><a href="./log/">nameserver</a></li>
         {{- else }}
         <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
         {{- end }}
@@ -169,7 +169,7 @@ flush /opt/app/current/conf/caddy/index.html << HTML_EOF
         {{- range  $consoleNodes }}
         {{- if eq . (getv "/host/ip") }}
         <li><span>⊟</span>{{ . }}</li>
-        <li><span class="sub-1">⊞</span><a href="./logs/">console</a></li>
+        <li><span class="sub-1">⊞</span><a href="./log/">console</a></li>
         {{- else }}
         <li><span>⊞</span><a href="//{{ . }}/">{{ . }}</a></li>
         {{- end }}

@@ -8,13 +8,17 @@
     "container": {
       "type": "lxc",
       "zone": "ap2a",
-      "image": "img-aky2ckgg"
+      "image": "img-2sbq6nf9"
     },
     "role": "nameserver",
     "count": {{cluster.nameserver.count}},
     "cpu": {{cluster.nameserver.cpu}},
     "memory": {{cluster.nameserver.memory}},
     "instance_class": {{cluster.nameserver.instance_class}},
+    "volume": {
+      "size": {{cluster.nameserver.volume_size}},
+      "mount_point": "/data/"
+    },
     "services": {
       "init": {
         "order": 1,
@@ -52,7 +56,7 @@
     "container": {
       "type": "lxc",
       "zone": "ap2a",
-      "image": "img-aky2ckgg"
+      "image": "img-2sbq6nf9"
     },
     "role": "broker",
     "count": {{cluster.broker.count}},
@@ -61,7 +65,7 @@
     "instance_class": {{cluster.broker.instance_class}},
     "volume": {
       "size": {{cluster.broker.volume_size}},
-      "mount_point": "/data/broker"
+      "mount_point": "/data/"
     },
     "replica": {{cluster.broker.replica}},
     "services": {
@@ -166,7 +170,7 @@
     "container": {
       "type": "kvm",
       "zone": "ap2a",
-      "image": "img-aky2ckgg"
+      "image": "img-2sbq6nf9"
     },
     "role": "client",
     "count": {{cluster.client.count}},

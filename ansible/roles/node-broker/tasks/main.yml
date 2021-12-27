@@ -5,9 +5,30 @@
     dest: /opt/app/
     owner: "rocketmq"
     group: "svc"
-    mode: preserve
+    mode: "755"
     directory_mode: "750"
 
 - name: install confd files
   include_role:
     name: confd-files
+
+- name: link broker logback file
+  file:
+    src: /opt/app/current/conf/broker/logback_broker.xml
+    dest: /opt/rocketmq/current/conf/logback_broker.xml
+    state: link
+    force: yes
+
+- name: link tools logback file
+  file:
+    src: /opt/app/current/conf/broker/logback_tools.xml
+    dest: /opt/rocketmq/current/conf/logback_tools.xml
+    state: link
+    force: yes
+
+- name: link tools shell
+  file:
+    src: /opt/app/current/conf/broker/tools.sh
+    dest: /opt/rocketmq/current/bin/tools.sh
+    state: link
+    force: yes

@@ -3,10 +3,14 @@
 ###################
 
 initNode() {
+  log "INFO: Application is about to initialize . "
   mkdir -p -m=750 /data/nameserver
   chown -R rocketmq:svc /data/nameserver
-  ln -s -f /opt/app/current/conf/caddy/index.html /data/nameserver/index.html
+  mkdir -p /data/log/nameserver
+  chmod 777 /data/log/nameserver
+  ln -s -f /opt/app/current/conf/caddy/index.html /data/index.html
   _initNode
+  log "INFO: Application initialization completed  . "
 }
 
 readClusterListFromNameserver() {
@@ -21,4 +25,18 @@ readClusterListFromNameserver() {
   "data": [ ${brokers} ]
 }
 BROKERS_LIST
+}
+
+checkSvc() {
+  checkActive ${1%%/*} || {
+    log "INFO: Service '$1' is inactive."
+    return $EC_CHECK_INACTIVE
+  }
+  local endpoints=$(echo $1 | awk -F/ '{print $3}')
+  local endpoint; for endpoint in ${endpoints//,/ }; do
+    checkEndpoint $endpoint || {
+      log "WARN: Endpoint '$endpoint' is unreachable."
+      return 0
+    }
+  done
 }

@@ -13,14 +13,14 @@ JAVA_OPT="-Dcom.rocketmq.sendMessageWithVIPChannel=false \
 -Xms{{ $halfMemory }}m \
 -Xmx{{ $halfMemory }}m \
 -XX:+ExitOnOutOfMemoryError \
--XX:ErrorFile=/data/console/logs/consolelogs/hs_err.log \
+-XX:ErrorFile=/data/log/console/hs_err.log \
 -XX:+PrintGCDetails \
 -XX:+PrintGCTimeStamps \
 -XX:+PrintGCDateStamps \
 -XX:+PrintClassHistogram \
 -XX:+PrintTenuringDistribution \
 -XX:+PrintGCApplicationStoppedTime \
--Xloggc:/data/console/logs/consolelogs/gc.log \
+-Xloggc:/data/log/console/gc.log \
 -XX:+UseGCLogFileRotation \
 -XX:NumberOfGCLogFiles=5 \
 -XX:GCLogFileSize=2m "

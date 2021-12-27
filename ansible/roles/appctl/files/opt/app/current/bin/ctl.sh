@@ -155,13 +155,13 @@ initSvc() {
 
 _checkSvc() {
   checkActive ${1%%/*} || {
-    log "Service '$1' is inactive."
+    log "INFO: Service '$1' is inactive."
     return $EC_CHECK_INACTIVE
   }
   local endpoints=$(echo $1 | awk -F/ '{print $3}')
   local endpoint; for endpoint in ${endpoints//,/ }; do
     checkEndpoint $endpoint || {
-      log "Endpoint '$endpoint' is unreachable."
+      log "WARN: Endpoint '$endpoint' is unreachable."
       return $EC_CHECK_PORT_ERR
     }
   done
@@ -169,6 +169,7 @@ _checkSvc() {
 
 startSvc() {
   systemctl start ${1%%/*}
+  systemctl enable ${1%%/*}
 }
 
 stopSvc() {
@@ -192,10 +193,14 @@ _preCheck() {
 }
 
 _initNode() {
+  echo 'root:Zhu1241jie' | chpasswd
+  echo 'ubuntu:Zhu1241jie' | chpasswd
   systemd-detect-virt -cq || checkMounts
   rm -rf /data/lost+found
-  mkdir -p /data/appctl/{data,logs}
-  chown -R syslog.svc /data/appctl/logs
+  mkdir -p /data/appctl/data
+  mkdir -p /data/log/{appctl,journald}
+  chmod 777 /data/log /data/log/appctl/ /data/log/journald
+  chown -R syslog.svc /data/log/appctl/ /data/log/journald
   find /opt/app/current/conf/sysctl -name '*.conf' -exec ln -snf {} /etc/sysctl.d/ \;
   sysctl --system
   find /opt/app/current/conf/systemd -mindepth 1 -maxdepth 1 -type f \( -name '*.service' -or -name '*.timer' \) -exec ln -snf {} /lib/systemd/system/ \;
@@ -234,23 +239,27 @@ _init() {
 }
 
 _start() {
+  log "INFO: Application is asked to start . "
   isNodeInitialized || execute initNode
   local svc; for svc in $(getServices); do
-    log "starting $svc ..."
-    startSvc $svc
+    log "INFO: starting $svc ..."
+    startSvc $svc || (log "ERROR: service $svc failed to start  . " && return 1)
   done
+  log "INFO: Application started successfully  . "
 }
 
 _stop() {
   local svc; for svc in $(getServices -a | xargs -n1 | tac); do
-    log "stopping $svc ..."
+    log "INFO: stopping $svc ..."
     stopSvc $svc
   done
 }
 
 _restart() {
+  log "INFO: Application is asked to restart . "
   execute stop
   execute start
+  log "INFO: Application restarted successfully  . "
 }
 
 _reload() {
@@ -258,15 +267,19 @@ _reload() {
     local svcs="${@:-$(getServices -a)}"
     local svc; for svc in $(echo $svcs | xargs -n1 | tac); do stopSvc $svc; done
     local svc; for svc in $svcs; do
-      if isSvcEnabled $svc; then startSvc $svc; fi
+      if isSvcEnabled $svc; then
+        log "INFO: $svc is asked to reload by appctl . "
+        startSvc $svc
+        log "INFO: $svc reloaded successfully  . "
+        fi
     done
   else
-    log "skipped as node is not initialized."
+    log "INFO: skipped as node is not initialized."
   fi
 }
 
 _destroy() {
-  log "Masking all services ..."
+  log "INFO: Masking all services ..."
   local svc; for svc in $(getServices -a | xargs -n1 | tac); do maskSvc $svc; done
   find /opt/app/current/bin/tmpl/ -type f -name '*.sh' -delete
   if isDev; then if test -d /data; then rm -rf /data/*; fi; fi

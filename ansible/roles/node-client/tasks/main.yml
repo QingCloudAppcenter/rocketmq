@@ -5,7 +5,7 @@
     dest: /opt/app/
     owner: "rocketmq"
     group: "svc"
-    mode: preserve
+    mode: "755"
     directory_mode: "750"
 
 - name: install confd files

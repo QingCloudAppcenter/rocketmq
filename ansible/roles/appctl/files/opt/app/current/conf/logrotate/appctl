@@ -1,4 +1,4 @@
-/data/appctl/logs/appctl.log {
+/data/log/appctl/appctl.log {
   weekly
   maxsize 2M
   rotate 5

@@ -31,7 +31,7 @@
     remote_src: yes
   delegate_to: localhost
   when:
-  - cached_file.stat.exists == False and jar_file.stat.exists == False
+    - cached_file.stat.exists == False and jar_file.stat.exists == False
 
 - name: mv file to local_cache
   shell: rsync -a -p /tmp/rocketmq-externals-5c48ed165d2e85a01e88b074ac14608a09e85a47/ {{ local_cache_path }}/rocketmq-externals
@@ -63,7 +63,7 @@
 
 - name: start docker
   systemd:
-    name: docker 
+    name: docker
     state: started
     enabled: no
   delegate_to: localhost
@@ -73,27 +73,29 @@
     name: console-jar-compiler
     image: "maven:3.6-openjdk-11"
     command: mvn clean package -Dmaven.test.skip=true
+    detach: no
+    auto_remove: yes
     state: started
     recreate: yes
     working_dir: /usr/src/rocketmq-console
     volumes:
       - "{{ local_cache_path }}/rocketmq-externals/rocketmq-console:/usr/src/rocketmq-console"
   delegate_to: localhost
-  #  when:
-          #  - cached_file.stat.exists == True and jar_file.stat.exists == False
-
-- name: stop docker
-  systemd:
-    name: docker
-    state: stopped
-    enabled: no
-  delegate_to: localhost
+    #  when:
+  #  - cached_file.stat.exists == True and jar_file.stat.exists == False
 
 - name: wait for jar finish compile
   wait_for:
     timeout: 7200
     path: "{{ local_cache_path }}/rocketmq-externals/rocketmq-console/target/rocketmq-console-ng-{{ console_version }}.jar"
     state: present
+  delegate_to: localhost
+
+- name: stop docker
+  systemd:
+    name: docker
+    state: stopped
+    enabled: no
   delegate_to: localhost
 
 - name: prepare service directories

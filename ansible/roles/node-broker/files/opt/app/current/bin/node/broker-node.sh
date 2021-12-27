@@ -6,11 +6,16 @@ EC_INSUFFICIENT_VOLUME=230
 EC_UNHEALTHY=240
 
 initNode() {
+  log "INFO: Application is about to initialize . "
   # Fix permissions for attached volume.
-  chown -R rocketmq.svc ${DATA_MOUNTS}
-  chmod 750 ${DATA_MOUNTS}
+  mkdir -p /data/broker
+  chown -R rocketmq.svc /data/broker
+  chmod 750 /data/broker
   ln -s -f /opt/app/current/conf/caddy/index.html ${DATA_MOUNTS}/index.html
+  mkdir -p /data/log/broker
+  chmod 777 /data/log/broker
   _initNode
+  log "INFO: Application initialization completed  . "
 }
 
 metricsFile="/data/broker/rocketmq-metrics.json"
@@ -21,6 +26,8 @@ measure() {
 }
 
 generateBrokerMetrics() {
+  log "INFO: Broker start generate metrics"
+  export JAVA_HOME=$JAVA_HOME
   local filter metrics putTps getFoundTps getMissTps getTotalTps;
   local getTransferedTps getCountToday putCountToday msgAvgSize;
   filter="stub|putTps|getFoundTps|getMissTps|getTotalTps|getTransferedTps|msgGetTotalTodayNow|msgPutTotalTodayNow|msgGetTotalTodayMorning|msgPutTotalTodayMorning|putMessageAverageSize" ;
@@ -46,4 +53,19 @@ generateBrokerMetrics() {
   "msgAvgSize": ${msgAvgSize:-0}
 }
 METRICS_FILE
+  log "INFO: Broker finish generate metrics"
+}
+
+checkSvc() {
+  checkActive ${1%%/*} || {
+    log "INFO: Service '$1' is inactive."
+    return $EC_CHECK_INACTIVE
+  }
+  local endpoints=$(echo $1 | awk -F/ '{print $3}')
+  local endpoint; for endpoint in ${endpoints//,/ }; do
+    checkEndpoint $endpoint || {
+      log "WARN: Endpoint '$endpoint' is unreachable."
+      return 0
+    }
+  done
 }
