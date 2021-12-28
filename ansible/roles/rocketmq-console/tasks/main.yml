@@ -61,6 +61,12 @@
   when: returnmsg.rc|default('')!=0
   delegate_to: localhost
 
+- name: pip install docker
+  pip:
+    name: docker==5.0.3
+    executable: pip3
+    state: present
+
 - name: start docker
   systemd:
     name: docker
