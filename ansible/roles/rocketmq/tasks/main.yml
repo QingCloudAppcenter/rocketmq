@@ -23,7 +23,7 @@
       dest_path: "/opt/rocketmq/"
 
 - name: rename file
-  shell: rsync -a /opt/rocketmq/rocketmq-all-{{ mq_version }}-bin-release/  /opt/rocketmq/{{ mq_version }}
+  shell: rsync -a /opt/rocketmq/rocketmq-{{ mq_version }}/  /opt/rocketmq/{{ mq_version }}
 
 - name: set curent version symbolic link
   file:
