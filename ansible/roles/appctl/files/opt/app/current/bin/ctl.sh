@@ -225,13 +225,9 @@ _revive() {
 }
 
 _check() {
-  if isClusterInitialized && isNodeInitialized; then
-    local svc; for svc in $(getServices); do
-      execute checkSvc $svc
-    done
-  else
-    log "Skipped as cluster or node is not initialized."
-  fi
+  local svc; for svc in $(getServices); do
+    execute checkSvc $svc
+  done
 }
 
 _init() {
